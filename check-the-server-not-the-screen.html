@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Why my tests check the server, not the screen | Sudhanshu Shekhar</title>
+<meta name="description" content="Verifying invoices, GST and stock through the API catches the bugs a UI-only assertion misses.">
+<meta name="author" content="Sudhanshu Shekhar">
+<meta property="og:title" content="Why my tests check the server, not the screen">
+<meta property="og:description" content="Verifying invoices, GST and stock through the API catches the bugs a UI-only assertion misses.">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1F5;--surface:#FFFFFF;--ink:#142033;--muted:#5A687C;--faint:#8794A6;--line:#D8DEE7;--accent:#1F6F78;--accent-soft:#E1EFF0;--code-bg:#142033;--code-ink:#DCE5F2;
+--serif:"Newsreader",Georgia,serif;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#6F7E93;--line:#26344A;--accent:#6CC3CC;--accent-soft:#16323A;--code-bg:#0A101A}}
+:root[data-theme="dark"]{--bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#6F7E93;--line:#26344A;--accent:#6CC3CC;--accent-soft:#16323A;--code-bg:#0A101A}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.08rem/1.75 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .in{max-width:760px;margin:0 auto;padding:0 1.4rem;height:60px;display:flex;align-items:center;gap:1rem}
+.back{color:var(--ink);text-decoration:none;font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.4rem;margin-right:auto}
+.back:hover{color:var(--accent)}
+.icon-btn{background:none;border:1px solid var(--line);color:var(--ink);border-radius:10px;width:38px;height:38px;cursor:pointer}
+.progress{position:absolute;left:0;bottom:-1px;height:2px;background:var(--accent);width:0}
+article{max-width:760px;margin:0 auto;padding:3.5rem 1.4rem 2rem}
+.tagline{display:inline-block;font-size:.85rem;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:.2rem .7rem;border-radius:999px;margin-bottom:1.2rem}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,5.5vw,3.3rem);line-height:1.08;letter-spacing:-.02em;margin:0 0 1rem}
+.dek{font-family:var(--serif);font-size:1.35rem;line-height:1.5;color:var(--muted);margin:0 0 1.8rem}
+.meta{display:flex;align-items:center;gap:.9rem;padding:1rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:2.4rem}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:600}
+.meta b{display:block;font-size:.98rem}.meta span{color:var(--muted);font-size:.9rem}
+.body h2{font-family:var(--serif);font-weight:500;font-size:1.75rem;line-height:1.2;letter-spacing:-.01em;margin:2.6rem 0 .8rem}
+.body p,.body li{max-width:66ch}
+.body p{margin:0 0 1.2rem}
+.body ul,.body ol{padding-left:1.3rem;margin:0 0 1.3rem}.body li{margin-bottom:.5rem}
+.body code{font-family:var(--mono);font-size:.86em;background:var(--accent-soft);color:var(--ink);padding:.1em .35em;border-radius:5px}
+.body pre{background:var(--code-bg);color:var(--code-ink);font:.84rem/1.7 var(--mono);padding:1.2rem 1.3rem;border-radius:12px;overflow-x:auto;margin:0 0 1.5rem}
+.body pre code{background:none;color:inherit;padding:0;font-size:inherit}
+.c{color:#7C8BA3}.k{color:#8FB4FF}.s{color:#9FDDB0}
+.callout{border-left:3px solid var(--accent);background:var(--surface);padding:1rem 1.2rem;border-radius:0 12px 12px 0;margin:0 0 1.5rem}
+.callout p:last-child{margin:0}
+.end{margin-top:3rem;padding:1.6rem;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.end h3{font-family:var(--serif);font-weight:500;font-size:1.3rem;margin:0 0 .4rem}
+.end p{color:var(--muted);margin:0 0 1rem}
+.end .links{display:flex;flex-wrap:wrap;gap:.6rem}
+.btn{display:inline-block;padding:.6rem 1rem;border-radius:10px;font-weight:600;text-decoration:none;border:1.5px solid var(--line);color:var(--ink);font-size:.95rem}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.more{max-width:760px;margin:0 auto;padding:1rem 1.4rem 4rem}
+.more h3{font-family:var(--serif);font-weight:500;font-size:1.4rem;margin:0 0 1rem}
+.more a.card{display:block;padding:1.1rem 1.2rem;border:1px solid var(--line);border-radius:14px;text-decoration:none;color:var(--ink);margin-bottom:.7rem;background:var(--surface);transition:transform .2s,border-color .2s}
+.more a.card:hover{transform:translateX(4px);border-color:var(--accent)}
+.more a.card b{font-family:var(--serif);font-weight:500;font-size:1.15rem;display:block}
+.more a.card span{color:var(--muted);font-size:.92rem}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+article > *{animation:rise .6s ease both}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="bar"><div class="in">
+  <a class="back" href="index.html#writing">← Back to portfolio</a>
+  <button class="icon-btn" id="themeBtn" aria-label="Switch light or dark theme">◐</button>
+</div><div class="progress" id="prog"></div></header>
+
+<article>
+  <span class="tagline">API testing</span>
+  <h1>Why my tests check the server, not the screen</h1>
+  <p class="dek">Verifying invoices, GST and stock through the API catches the bugs a UI-only assertion misses.</p>
+  <div class="meta"><div class="avatar" aria-hidden="true">SS</div><div><b>Sudhanshu Shekhar</b><span>Senior QA Automation Engineer · 3 min read · October 2026</span></div></div>
+  <div class="body">
+<p>Most UI tests end by checking something on the screen: a success message, a total, a receipt. If it looks right, the test passes. In retail POS testing, I've learned that this isn't enough. The screen shows what the frontend <em>thinks</em> happened. What matters is what the server actually booked.</p>
+
+<h2>The screen can be right while the data is wrong</h2>
+<p>A POS screen can show a correct total and still save a wrong invoice. Some of the ways this happens:</p>
+<ul>
+  <li>The frontend calculates tax one way, and the server recalculates it differently when the invoice is saved.</li>
+  <li>A discount looks applied on screen, but isn't saved with the invoice.</li>
+  <li>The receipt prints, but the invoice is stuck as a draft instead of paid.</li>
+  <li>The sale completes, but stock isn't deducted, or the invoice isn't linked to the right customer or payment.</li>
+</ul>
+<p>Each of these passes a UI-only test. Each of them is a real problem for a retailer: wrong tax filings, wrong stock counts, or money that doesn't reconcile at the end of the day.</p>
+
+<h2>The pattern: arrange with the API, act in the UI, assert on the server</h2>
+<p>My tests follow one simple pattern:</p>
+<ol>
+  <li><strong>Arrange through the API.</strong> Create the item, price and tax setup directly. The UI isn't what's being tested here, so there's no reason to click through it.</li>
+  <li><strong>Act through the UI.</strong> Do the thing a cashier does: add items, apply a discount, take payment. This is the behaviour under test.</li>
+  <li><strong>Assert on the server.</strong> Fetch the booked invoice through the API and check what was saved.</li>
+</ol>
+<pre><code>test(<span class="s">'POS sale books correct GST on the server'</span>, <span class="k">async</span> ({ posPage, api }) =&gt; {
+  <span class="c">// Arrange: set up data through the API</span>
+  <span class="k">const</span> item = <span class="k">await</span> api.createItem({ rate: 1000, taxTemplate: <span class="s">'GST 18%'</span> });
+
+  <span class="c">// Act: complete the sale like a cashier would</span>
+  <span class="k">await</span> posPage.addToCart(item.code, 2);
+  <span class="k">const</span> invoiceName = <span class="k">await</span> posPage.payWithCash();
+
+  <span class="c">// Assert: check what the server actually booked</span>
+  <span class="k">const</span> invoice = <span class="k">await</span> api.getInvoice(invoiceName);
+  expect(invoice.status).toBe(<span class="s">'Paid'</span>);
+  expect(invoice.total_taxes_and_charges).toBe(360);
+  expect(invoice.grand_total).toBe(2360);
+});</code></pre>
+<p>The key detail is that the test reads the invoice <em>by name</em>, the exact invoice this sale created. It doesn't search for "the latest invoice", which could belong to another test running in parallel.</p>
+
+<h2>What I check on the server</h2>
+<p>In my <a href="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation" target="_blank" rel="noopener">ERPNext POS framework</a>, the API client checks each booked invoice for three things:</p>
+<ul>
+  <li><strong>Status:</strong> the invoice is actually paid and submitted, not left as a draft.</li>
+  <li><strong>GST totals:</strong> tax is calculated on the right amount, after discounts, and matches the tax template.</li>
+  <li><strong>Links:</strong> the invoice points to the right customer, items and payment.</li>
+</ul>
+<p>At work, the same idea extends to stock deduction, pricing and payment flows. If a sale should reduce stock by two, the test checks the stock level, not a message saying "sale complete".</p>
+
+<h2>A bonus: faster, more stable tests</h2>
+<p>Moving setup to the API wasn't only about better checks. It made the whole suite faster and less flaky. At iVend Retail, replacing UI-driven login and data creation with API calls cut suite runtime by about 30%. Fewer clicks means fewer places for timing issues, and each test spends its time on the behaviour that matters.</p>
+
+<h2>When the screen still matters</h2>
+<p>This doesn't mean UI assertions are useless. The cashier needs to see the right total, the right error message when stock runs out, and a receipt that matches the invoice. So I check both: the screen for what the user sees, and the server for what the business keeps. A good test confirms that the two agree.</p>
+<div class="callout"><p>The screen is what the user sees. The server is what the business keeps. Test both, and make sure they agree.</p></div>
+
+<h2>Try it on your own suite</h2>
+<p>Pick one end-to-end test that ends with a UI check. Add one API call at the end that fetches the record it created and checks a few key fields. There's a good chance you'll find something the screen was hiding.</p>
+
+  </div>
+  <div class="end">
+    <h3>Want to talk about this?</h3>
+    <p>I'm happy to compare notes on test automation, Playwright and AI in testing.</p>
+    <div class="links">
+      <a class="btn primary" href="https://www.linkedin.com/in/sudhanshu-shekhar-sud" target="_blank" rel="noopener">Connect on LinkedIn</a>
+      <a class="btn" href="mailto:sudhanshushekhar496@gmail.com">Email me</a>
+      <a class="btn" href="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation" target="_blank" rel="noopener">See the code</a>
+    </div>
+  </div>
+</article>
+
+<section class="more">
+  <h3>More articles</h3>
+  <a class="card" href="ai-agent-playwright-tests.html"><b>Letting an AI agent write Playwright tests, safely</b><span>Lint rules, edit hooks and mutation checks that keep AI-written tests traceable to requirements and able to fail.</span></a>
+  <a class="card" href="katalon-to-playwright-migration.html"><b>Migrating 400+ scenarios from Katalon to Playwright</b><span>How to move a large POS suite without a freeze, keeping both suites running until the new one earns trust.</span></a>
+</section>
+
+<script>
+const prog=document.getElementById('prog');
+addEventListener('scroll',()=>{const h=document.documentElement;prog.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';},{passive:true});
+document.getElementById('themeBtn').addEventListener('click',()=>{const r=document.documentElement;const d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.theme=d?'light':'dark';});
+</script>
+</body>
+</html>

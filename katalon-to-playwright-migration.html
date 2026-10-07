@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Migrating 400+ scenarios from Katalon to Playwright | Sudhanshu Shekhar</title>
+<meta name="description" content="How to move a large POS suite without a freeze, keeping both suites running until the new one earns trust.">
+<meta name="author" content="Sudhanshu Shekhar">
+<meta property="og:title" content="Migrating 400+ scenarios from Katalon to Playwright">
+<meta property="og:description" content="How to move a large POS suite without a freeze, keeping both suites running until the new one earns trust.">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1F5;--surface:#FFFFFF;--ink:#142033;--muted:#5A687C;--faint:#8794A6;--line:#D8DEE7;--accent:#1F6F78;--accent-soft:#E1EFF0;--code-bg:#142033;--code-ink:#DCE5F2;
+--serif:"Newsreader",Georgia,serif;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#6F7E93;--line:#26344A;--accent:#6CC3CC;--accent-soft:#16323A;--code-bg:#0A101A}}
+:root[data-theme="dark"]{--bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#6F7E93;--line:#26344A;--accent:#6CC3CC;--accent-soft:#16323A;--code-bg:#0A101A}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.08rem/1.75 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .in{max-width:760px;margin:0 auto;padding:0 1.4rem;height:60px;display:flex;align-items:center;gap:1rem}
+.back{color:var(--ink);text-decoration:none;font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.4rem;margin-right:auto}
+.back:hover{color:var(--accent)}
+.icon-btn{background:none;border:1px solid var(--line);color:var(--ink);border-radius:10px;width:38px;height:38px;cursor:pointer}
+.progress{position:absolute;left:0;bottom:-1px;height:2px;background:var(--accent);width:0}
+article{max-width:760px;margin:0 auto;padding:3.5rem 1.4rem 2rem}
+.tagline{display:inline-block;font-size:.85rem;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:.2rem .7rem;border-radius:999px;margin-bottom:1.2rem}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,5.5vw,3.3rem);line-height:1.08;letter-spacing:-.02em;margin:0 0 1rem}
+.dek{font-family:var(--serif);font-size:1.35rem;line-height:1.5;color:var(--muted);margin:0 0 1.8rem}
+.meta{display:flex;align-items:center;gap:.9rem;padding:1rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:2.4rem}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:600}
+.meta b{display:block;font-size:.98rem}.meta span{color:var(--muted);font-size:.9rem}
+.body h2{font-family:var(--serif);font-weight:500;font-size:1.75rem;line-height:1.2;letter-spacing:-.01em;margin:2.6rem 0 .8rem}
+.body p,.body li{max-width:66ch}
+.body p{margin:0 0 1.2rem}
+.body ul,.body ol{padding-left:1.3rem;margin:0 0 1.3rem}.body li{margin-bottom:.5rem}
+.body code{font-family:var(--mono);font-size:.86em;background:var(--accent-soft);color:var(--ink);padding:.1em .35em;border-radius:5px}
+.body pre{background:var(--code-bg);color:var(--code-ink);font:.84rem/1.7 var(--mono);padding:1.2rem 1.3rem;border-radius:12px;overflow-x:auto;margin:0 0 1.5rem}
+.body pre code{background:none;color:inherit;padding:0;font-size:inherit}
+.c{color:#7C8BA3}.k{color:#8FB4FF}.s{color:#9FDDB0}
+.callout{border-left:3px solid var(--accent);background:var(--surface);padding:1rem 1.2rem;border-radius:0 12px 12px 0;margin:0 0 1.5rem}
+.callout p:last-child{margin:0}
+.end{margin-top:3rem;padding:1.6rem;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.end h3{font-family:var(--serif);font-weight:500;font-size:1.3rem;margin:0 0 .4rem}
+.end p{color:var(--muted);margin:0 0 1rem}
+.end .links{display:flex;flex-wrap:wrap;gap:.6rem}
+.btn{display:inline-block;padding:.6rem 1rem;border-radius:10px;font-weight:600;text-decoration:none;border:1.5px solid var(--line);color:var(--ink);font-size:.95rem}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.more{max-width:760px;margin:0 auto;padding:1rem 1.4rem 4rem}
+.more h3{font-family:var(--serif);font-weight:500;font-size:1.4rem;margin:0 0 1rem}
+.more a.card{display:block;padding:1.1rem 1.2rem;border:1px solid var(--line);border-radius:14px;text-decoration:none;color:var(--ink);margin-bottom:.7rem;background:var(--surface);transition:transform .2s,border-color .2s}
+.more a.card:hover{transform:translateX(4px);border-color:var(--accent)}
+.more a.card b{font-family:var(--serif);font-weight:500;font-size:1.15rem;display:block}
+.more a.card span{color:var(--muted);font-size:.92rem}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+article > *{animation:rise .6s ease both}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="bar"><div class="in">
+  <a class="back" href="index.html#writing">← Back to portfolio</a>
+  <button class="icon-btn" id="themeBtn" aria-label="Switch light or dark theme">◐</button>
+</div><div class="progress" id="prog"></div></header>
+
+<article>
+  <span class="tagline">Test automation</span>
+  <h1>Migrating 400+ scenarios from Katalon to Playwright</h1>
+  <p class="dek">How to move a large POS suite without a freeze, keeping both suites running until the new one earns trust.</p>
+  <div class="meta"><div class="avatar" aria-hidden="true">SS</div><div><b>Sudhanshu Shekhar</b><span>Senior QA Automation Engineer · 3 min read · October 2026</span></div></div>
+  <div class="body">
+<p>At iVend Retail I'm moving our POS and ERP regression suite from Katalon Studio to Playwright (JavaScript). So far that's more than 400 scenarios. The hardest part of a migration like this isn't writing the new tests. It's making sure the product stays protected the whole time you're doing it.</p>
+<p>Here's how I approached it, and what I'd tell anyone planning the same move.</p>
+
+<h2>Rule 1: never stop the old suite</h2>
+<p>The biggest risk in a test migration is a gap: a period where the old suite is switched off and the new one isn't ready. Releases don't pause for your migration.</p>
+<p>So both suites kept running side by side. Katalon kept guarding every release, and Playwright grew next to it. A scenario was only retired from Katalon once its Playwright version had run reliably over multiple cycles and caught the same things. The new suite had to earn trust before it took over.</p>
+<div class="callout"><p>Run old and new in parallel. Retire a test only when its replacement has proven itself, not when it's merely written.</p></div>
+
+<h2>Rule 2: build the foundation before migrating tests</h2>
+<p>It's tempting to start converting tests on day one, because it shows visible progress. I started with the shared building blocks instead, because every one of the 400 tests would depend on them:</p>
+<ul>
+  <li><strong>Login</strong>, done once and shared, not repeated in every test</li>
+  <li><strong>POS actions</strong> like adding items, applying discounts and taking payment, as page objects</li>
+  <li><strong>An API client</strong> for creating test data and checking results on the server</li>
+  <li><strong>Test data helpers</strong>, so each test creates exactly what it needs</li>
+  <li><strong>Logging</strong>, so a failure in CI explains itself</li>
+</ul>
+<p>Playwright fixtures made this clean. A test asks for what it needs, such as a logged-in POS page or an API client, and the fixture handles setup and cleanup.</p>
+
+<h2>Rule 3: migrate, don't translate</h2>
+<p>A line-by-line translation of a Katalon test gives you a Playwright test with all the old problems. Recorded tests often carry habits like fixed waits, long UI-driven setup and assertions on whatever text was visible.</p>
+<p>So each scenario was redesigned, not copied. The biggest change was setup. Many old tests logged in and created data through the UI before they even reached the thing being tested. I replaced that with API calls: log in once through the API and share the session state, and create test data directly. That one change cut suite runtime by about 30%.</p>
+<pre><code><span class="c">// Before: every test logs in through the UI</span>
+<span class="k">await</span> page.goto(<span class="s">'/login'</span>);
+<span class="k">await</span> page.fill(<span class="s">'#email'</span>, user);  <span class="c">// ...and so on</span>
+
+<span class="c">// After: log in once via API, reuse the session everywhere</span>
+<span class="c">// playwright.config.js</span>
+use: { storageState: <span class="s">'.auth/cashier.json'</span> }</code></pre>
+
+<h2>Rule 4: migrate by risk, not by folder</h2>
+<p>I didn't migrate in the order tests happened to sit in the Katalon project. I started with the flows where a bug costs the business most: sign-in, sales, pricing, GST, discounts, stock and payment. Those got the strongest coverage in the new suite first, so the riskiest areas were the first to benefit from faster, more reliable tests.</p>
+
+<h2>Rule 5: make CI flexible and fix failures at the root</h2>
+<p>The suite runs in GitHub Actions, with options to pick the suite, the environment and the browser for each run. That means a developer can run a quick check on one module, while a release gets the full regression. The full regression suite completes in about 50 minutes.</p>
+<p>The hardest bugs were failures that only happened in CI. They passed on my machine every time. The causes turned out to be things like:</p>
+<ul>
+  <li>cookie and session handling that behaved differently in the CI environment</li>
+  <li>Docker environment configuration</li>
+  <li>browser-specific timing differences</li>
+</ul>
+<p>The easy fix is to add retries and move on. I avoided that. Retries hide problems, and a suite that "usually passes" can't be used to sign off a release. Fixing each root cause is slower, but it's what made the suite stable enough that the team trusts its results.</p>
+
+<h2>What I'd tell someone starting this</h2>
+<ol>
+  <li>Keep the old suite running until the new one has earned its place.</li>
+  <li>Build shared components and fixtures before converting tests.</li>
+  <li>Redesign each test, especially its setup. Use the API wherever the UI isn't the thing being tested.</li>
+  <li>Start with the flows that cost the most when they break.</li>
+  <li>Treat flaky tests as bugs to fix, not noise to retry.</li>
+</ol>
+<p>A migration is a chance to fix years of habits, not just change tools. Done carefully, you end up with a suite that's faster, cleaner and, most importantly, trusted.</p>
+
+  </div>
+  <div class="end">
+    <h3>Want to talk about this?</h3>
+    <p>I'm happy to compare notes on test automation, Playwright and AI in testing.</p>
+    <div class="links">
+      <a class="btn primary" href="https://www.linkedin.com/in/sudhanshu-shekhar-sud" target="_blank" rel="noopener">Connect on LinkedIn</a>
+      <a class="btn" href="mailto:sudhanshushekhar496@gmail.com">Email me</a>
+      <a class="btn" href="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation" target="_blank" rel="noopener">See the code</a>
+    </div>
+  </div>
+</article>
+
+<section class="more">
+  <h3>More articles</h3>
+  <a class="card" href="ai-agent-playwright-tests.html"><b>Letting an AI agent write Playwright tests, safely</b><span>Lint rules, edit hooks and mutation checks that keep AI-written tests traceable to requirements and able to fail.</span></a>
+  <a class="card" href="check-the-server-not-the-screen.html"><b>Why my tests check the server, not the screen</b><span>Verifying invoices, GST and stock through the API catches the bugs a UI-only assertion misses.</span></a>
+</section>
+
+<script>
+const prog=document.getElementById('prog');
+addEventListener('scroll',()=>{const h=document.documentElement;prog.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';},{passive:true});
+document.getElementById('themeBtn').addEventListener('click',()=>{const r=document.documentElement;const d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.theme=d?'light':'dark';});
+</script>
+</body>
+</html>
