@@ -117,7 +117,7 @@ section{padding:5rem 0}
 /* About */
 .about{display:grid;grid-template-columns:1.4fr 1fr;gap:3.5rem}
 .about p{margin:0 0 1.1rem;max-width:62ch}
-.about p:first-child{font-family:var(--serif);font-size:1.4rem;line-height:1.5}
+.about p:first-child{font-size:1.2rem;line-height:1.6;color:var(--ink);font-weight:500}
 .focus{margin:0;padding:1.5rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg)}
 .focus h3{font-size:1.15rem;margin-bottom:.8rem}
 .focus li{padding:.55rem 0;border-top:1px solid var(--line);display:flex;gap:.7rem}
@@ -419,9 +419,9 @@ footer a{color:var(--muted)}
       <div class="head"><h2>About</h2><p>From mechanical engineering to test automation, with a focus on reliable regression suites.</p></div>
       <div class="about">
         <div>
-          <p>I'm a QA Automation Engineer with 5+ years of experience testing retail POS and ERP systems. At iVend Retail I'm leading the move of our POS automation from Katalon to Playwright (JavaScript).</p>
-          <p>I build frameworks that verify what the server actually booked — invoice status, GST totals, stock — rather than trusting the UI alone. My suites run in GitHub Actions with selectable suites, environments and browsers, and I dig into CI-only failures until they're fixed at the root, so the regression suite is stable enough for release sign-off.</p>
-          <p>I have a B.Tech in Mechanical Engineering and moved into software testing in 2021. Since then I have worked across retail, telecom, HR scheduling and ERP products. Lately I've been exploring how AI coding agents can write tests safely, with lint rules and review guardrails keeping them honest.</p>
+          <p>I'm a QA Automation Engineer with 5+ years of experience testing retail POS and ERP systems. At iVend Retail I'm moving our POS test automation from Katalon to Playwright (JavaScript).</p>
+          <p>When I test a sale, I don't only look at the screen. My tests also check the invoice the server saved: its status, the GST and the stock. The tests run in GitHub Actions, where we can pick the suite, the environment and the browser for each run. When a test fails only in CI, I find the real cause and fix it instead of adding retries. That's what makes the results good enough for release sign-off.</p>
+          <p>I have a B.Tech in Mechanical Engineering and moved into software testing in 2021. Since then I have worked on retail, telecom, HR scheduling and ERP products. Lately I've been using AI coding agents to write tests, with lint rules and reviews to catch their mistakes.</p>
         </div>
         <div class="focus">
           <h3>What I bring to a team</h3>
@@ -872,6 +872,8 @@ function checkPerfect(scores){
 }
 
 /* Lighthouse gauges */
+// Paste your free PageSpeed Insights API key here (restricted to this site). See README step.
+const PSI_KEY = 'AIzaSyBrapnVtDcrV2W7ellB66VdbfarPZ6odgg';
 const CIRC=2*Math.PI*52;
 function setGauge(g,score){
   const num=g.querySelector('.g-num'), arc=g.querySelector('.g-arc');
@@ -891,10 +893,14 @@ lhBtn.addEventListener('click',async()=>{
   document.getElementById('lhPerfect').hidden=true; document.querySelector('.lh-report').classList.remove('perfect');
   const api='https://www.googleapis.com/pagespeedonline/v5/runPagespeed?strategy=mobile'
     +'&category=PERFORMANCE&category=ACCESSIBILITY&category=BEST_PRACTICES&category=SEO'
+    +(PSI_KEY?'&key='+PSI_KEY:'')
     +'&url='+encodeURIComponent('https://sudhansushekhar.github.io/sudhanshu-shekhar/');
   try{
     const res=await fetch(api);
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    if(!res.ok){
+      let msg=''; try{msg=(await res.json()).error.message||'';}catch(_){}
+      const err=new Error(msg); err.status=res.status; throw err;
+    }
     const data=await res.json();
     const cats=data.lighthouseResult.categories;
     const got=gauges.map(g=>{const c=cats[g.dataset.key];const v=c&&c.score!=null?Math.round(c.score*100):null;setGauge(g,v);return v;});
@@ -902,7 +908,12 @@ lhBtn.addEventListener('click',async()=>{
     lhStatus.textContent='Tested just now with Google PageSpeed Insights (mobile, Lighthouse '+(data.lighthouseResult.lighthouseVersion||'')+').';
   }catch(e){
     gauges.forEach(g=>setGauge(g,parseInt(g.dataset.score,10)));
-    lhStatus.innerHTML='Google\'s test service is busy right now. Try again in a minute, or <a href="https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fsudhansushekhar.github.io%2Fsudhanshu-shekhar%2F" target="_blank" rel="noopener">open the full report</a>.';
+    const link=' <a href="https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fsudhansushekhar.github.io%2Fsudhanshu-shekhar%2F" target="_blank" rel="noopener">Open the full report on PageSpeed Insights</a> instead.';
+    const why = e.status===429 ? 'Google\'s free test limit is used up for now.'
+              : e.status===400 ? 'Google could not test the page.'
+              : 'The live test could not run right now.';
+    lhStatus.innerHTML=why+link;
+    console.warn('PageSpeed Insights:', e.status, e.message);
   }
   lhBtn.disabled=false; lhBtn.textContent='Run again';
 });
