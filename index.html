@@ -249,14 +249,19 @@ td.p{color:var(--pass);font-weight:600}td.f{color:var(--fail);font-weight:600}
 .post:hover .read span{transform:translateX(4px)}
 
 /* Education + certs */
-.edu{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.edu{display:grid;grid-template-columns:2.2fr 1fr;gap:1rem;align-items:start}
+.cert-list{display:grid;grid-template-columns:1fr 1fr;column-gap:2rem}
+.cert-list .cert{border-top:1px solid var(--line)}
+.cert-list .cert:nth-child(-n+2){border-top:none}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:1.6rem}
 .card h3{font-size:1.3rem;margin-bottom:1rem}
 .cert{display:flex;justify-content:space-between;gap:1rem;padding:.75rem 0;border-top:1px solid var(--line)}
 .cert:first-of-type{border-top:none}
 .cert span{color:var(--muted);white-space:nowrap;font-size:.93rem}
+.cert .issuer{display:block;color:var(--muted);font-size:.85rem;margin-top:.1rem}
 .cert .verify{display:block;width:fit-content;margin-top:.2rem;font-size:.88rem;font-weight:600}
-@media (max-width:760px){.edu{grid-template-columns:1fr}}
+@media (max-width:900px){.edu{grid-template-columns:1fr}}
+@media (max-width:640px){.cert-list{grid-template-columns:1fr}.cert-list .cert:nth-child(2){border-top:1px solid var(--line)}}
 
 .lh{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem}
 .lh-score{display:flex;align-items:center;gap:1rem;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem 1.3rem}
@@ -689,9 +694,16 @@ test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included
       <div class="edu">
         <div class="card">
           <h3>Certifications</h3>
-          <div class="cert"><div><b>Katalon Professional Level Certification</b><a class="verify" href="https://academy.katalon.com/mcertificate/6aad159ab6b54" target="_blank" rel="noopener">Verify on Katalon Academy</a></div><span>Sep 2026</span></div>
-          <div class="cert"><div><b>Katalon AI-skilled Practitioner Certification</b><a class="verify" href="https://academy.katalon.com/mcertificate/6aad159b5ae7b" target="_blank" rel="noopener">Verify on Katalon Academy</a></div><span>Sep 2026</span></div>
-          <div class="cert"><div><b>AI-driven Test Automation Engineer (testRigor)</b><a class="verify" href="https://testrigor.com/certificates/DB3gCZYuoFS7qAMmZpKSSznc" target="_blank" rel="noopener">Verify on testRigor</a></div><span>Sep 2024</span></div>
+          <div class="cert-list">
+          <div class="cert"><div><b>Katalon Professional Certification</b><small class="issuer">Katalon</small><a class="verify" href="https://academy.katalon.com/mcertificate/6aad159ab6b54" target="_blank" rel="noopener">Verify on Katalon Academy</a></div><span>Sep 2026</span></div>
+          <div class="cert"><div><b>Katalon AI Skilled Practitioner Certification</b><small class="issuer">Katalon</small><a class="verify" href="https://academy.katalon.com/mcertificate/6aad159b5ae7b" target="_blank" rel="noopener">Verify on Katalon Academy</a></div><span>Sep 2026</span></div>
+          <div class="cert"><div><b>Katalon Expert Level Certification</b><small class="issuer">Katalon</small><a class="verify" href="https://academy.katalon.com/mcertificate/686355e671fbf" target="_blank" rel="noopener">Verify on Katalon Academy</a></div><span>Jul 2025</span></div>
+          <div class="cert"><div><b>Katalon Practitioner Level Certification</b><small class="issuer">Katalon</small><a class="verify" href="https://academy.katalon.com/mcertificate/67eb83fed6c44" target="_blank" rel="noopener">Verify on Katalon Academy</a></div><span>Apr 2025</span></div>
+          <div class="cert"><div><b>Pioneering Generative AI in Test Automation with Katalon</b><small class="issuer">Katalon</small><a class="verify" href="https://academy.katalon.com/mcertificate/lp67a62574110dd" target="_blank" rel="noopener">Verify on Katalon Academy</a></div><span>Feb 2025</span></div>
+          <div class="cert"><div><b>AI-driven Test Automation Engineer</b><small class="issuer">testRigor</small><a class="verify" href="https://testrigor.com/certificates/DB3gCZYuoFS7qAMmZpKSSznc" target="_blank" rel="noopener">Verify on testRigor</a></div><span>Sep 2024</span></div>
+          <div class="cert"><div><b>MySQL Basics</b><small class="issuer">Great Learning</small><a class="verify" href="https://olympus1.greatlearning.in/course_certificate/KFWWOSQB" target="_blank" rel="noopener">Verify on Great Learning</a></div><span>May 2021</span></div>
+          <div class="cert"><div><b>SQL for Data Science</b><small class="issuer">Great Learning</small></div><span>May 2021</span></div>
+          </div>
         </div>
         <div class="card">
           <h3>Education</h3>
