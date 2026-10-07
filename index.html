@@ -263,15 +263,39 @@ td.p{color:var(--pass);font-weight:600}td.f{color:var(--fail);font-weight:600}
 @media (max-width:900px){.edu{grid-template-columns:1fr}}
 @media (max-width:640px){.cert-list{grid-template-columns:1fr}.cert-list .cert:nth-child(2){border-top:1px solid var(--line)}}
 
-.lh{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem}
-.lh-score{display:flex;align-items:center;gap:1rem;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem 1.3rem}
-.lh-score b{width:64px;height:64px;flex-shrink:0;border-radius:50%;border:4px solid var(--pass);display:grid;place-items:center;font-family:var(--serif);font-weight:500;font-size:1.5rem;color:var(--pass)}
-.lh-score span{font-weight:600;line-height:1.3}.lh-score small{color:var(--muted);font-weight:400;font-size:.85rem}
+.lh-report{position:relative;overflow:hidden;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:2rem 1.5rem 1.5rem;margin-bottom:1rem}
+.lh-fw{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.lh-perfect{position:relative;z-index:3;width:fit-content;margin:-.6rem auto 1.2rem;padding:.35rem .9rem;border-radius:999px;font-weight:600;font-size:.92rem;color:#fff;background:#0A8F4E;animation:pop .45s ease-out both}
+.lh-perfect[hidden]{display:none}
+.lh-report.perfect{border-color:#0CCE6B;box-shadow:0 0 0 3px rgba(12,206,107,.15)}
+.lh-gauges{display:flex;justify-content:center;flex-wrap:wrap;gap:1.5rem 3rem}
+.lh-gauge{position:relative;width:120px;display:flex;flex-direction:column;align-items:center;--c:#9AA4B2;--tint:rgba(154,164,178,.12)}
+.lh-gauge svg{width:96px;height:96px;transform:rotate(-90deg)}
+.lh-gauge circle{fill:none;stroke-width:8}
+.g-bg{stroke:var(--tint);fill:var(--tint)!important}
+.g-arc{stroke:var(--c);stroke-linecap:butt;stroke-dasharray:0 327;transition:stroke-dasharray 1s ease}
+.g-num{position:absolute;top:0;width:96px;height:96px;display:grid;place-items:center;font-family:var(--mono);font-size:1.75rem;color:var(--c)}
+.g-label{margin-top:.7rem;font-weight:500;text-align:center;line-height:1.25}
+.lh-gauge.green{--c:#0CCE6B;--tint:rgba(12,206,107,.1)}
+.lh-gauge.orange{--c:#FFA400;--tint:rgba(255,164,0,.1)}
+.lh-gauge.red{--c:#FF4E42;--tint:rgba(255,78,66,.1)}
+:root:not([data-theme="dark"]) .lh-gauge.green .g-num{color:#008800}
+:root:not([data-theme="dark"]) .lh-gauge.orange .g-num{color:#C33300}
+:root:not([data-theme="dark"]) .lh-gauge.red .g-num{color:#CC0000}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lh-gauge .g-num{color:var(--c)!important}}
+.lh-legend{display:flex;justify-content:center;gap:1.4rem;margin:1.4rem 0 1.2rem;font-family:var(--mono);font-size:.82rem;color:var(--muted)}
+.lh-legend i{display:inline-block;width:10px;height:10px;margin-right:.4rem}
+.lg-red{background:#FF4E42;clip-path:polygon(50% 0,100% 100%,0 100%)}.lg-orange{background:#FFA400}.lg-green{background:#0CCE6B;border-radius:50%}
+.lh-run{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;text-align:left;border-top:1px solid var(--line);padding-top:1.2rem}
+.lh-run p{margin:0;color:var(--muted);font-size:.93rem;max-width:52ch}
+.lh-run .btn[disabled]{opacity:.6;cursor:progress}
+.lh-gauge.loading .g-arc{stroke-dasharray:60 327;animation:spin 1s linear infinite;transform-origin:60px 60px}
+@keyframes spin{to{transform:rotate(360deg)}}
 .lh-note{color:var(--muted);font-size:.95rem;margin:0 0 2rem;max-width:70ch}
 .checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem 2rem}
 .checks h3{font-family:var(--sans);font-weight:600;font-size:1rem;margin-bottom:.3rem}
 .checks p{margin:0;color:var(--muted);font-size:.95rem}
-@media (max-width:760px){.lh{grid-template-columns:1fr}}
+@media (max-width:560px){.lh-gauges{gap:1.2rem 1.5rem}.lh-gauge{width:110px}}
 /* Contact */
 .contact{background:var(--code-bg);color:var(--code-ink);border-radius:24px;padding:3.5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:2.5rem;align-items:center}
 .contact h2{font-size:clamp(2rem,4.5vw,3rem);color:#fff;line-height:1.1;margin-bottom:1rem}
@@ -354,7 +378,7 @@ footer a{color:var(--muted)}
         <div class="avail">Open to QA automation roles</div>
         <h1>Sudhanshu Shekhar</h1>
         <p class="role">Senior QA Automation Engineer</p>
-        <p class="lead">I build Playwright and API test frameworks for retail POS and ERP systems that check what the server actually booked, not just what the screen shows.</p>
+        <p class="lead">I write automated tests for retail POS and ERP software, mostly with Playwright. My tests don't stop at the screen. They also check that every sale is saved correctly on the server.</p>
         <div class="cta">
           <a class="btn primary" href="#projects">View my work</a>
           <a class="btn" href="resume.pdf" download="Sudhanshu_Shekhar_Resume.pdf">Download Resume</a>
@@ -462,6 +486,7 @@ footer a{color:var(--muted)}
               <li>Moved automated regression earlier in each sprint so defects were caught before UAT, not after.</li>
               <li>Ran suites in Jenkins; tested REST APIs with Postman and RestAssured.</li>
               <li>Mentored junior testers, reviewed their automation code and onboarded new members onto the suites.</li>
+              <li>Received a <b>Spot Award</b> from TestingXperts (Sep 2023).</li>
             </ul>
           </div>
         </li>
@@ -717,12 +742,38 @@ test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included
   <section id="site-testing" class="alt">
     <div class="wrap">
       <div class="head"><h2>How I tested this site</h2><p>A QA portfolio should pass its own checks. This is what I ran on this page before publishing it.</p></div>
-      <div class="lh">
-        <div class="lh-score"><b>99</b><span>Performance<br><small>mobile; 100 on desktop</small></span></div>
-        <div class="lh-score"><b>100</b><span>Accessibility</span></div>
-        <div class="lh-score"><b>100</b><span>SEO</span></div>
+      <div class="lh-report">
+        <canvas class="lh-fw" id="lhFw" aria-hidden="true"></canvas>
+        <div class="lh-perfect" id="lhPerfect" hidden>All four scores are 100</div>
+        <div class="lh-gauges" role="group" aria-label="Lighthouse scores">
+          <div class="lh-gauge" data-key="performance" data-score="–">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="g-bg" cx="60" cy="60" r="52"/><circle class="g-arc" cx="60" cy="60" r="52"/></svg>
+          <span class="g-num">–</span>
+          <span class="g-label">Performance</span>
+        </div>
+          <div class="lh-gauge" data-key="accessibility" data-score="100">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="g-bg" cx="60" cy="60" r="52"/><circle class="g-arc" cx="60" cy="60" r="52"/></svg>
+          <span class="g-num">100</span>
+          <span class="g-label">Accessibility</span>
+        </div>
+          <div class="lh-gauge" data-key="best-practices" data-score="100">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="g-bg" cx="60" cy="60" r="52"/><circle class="g-arc" cx="60" cy="60" r="52"/></svg>
+          <span class="g-num">100</span>
+          <span class="g-label">Best Practices</span>
+        </div>
+          <div class="lh-gauge" data-key="seo" data-score="100">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="g-bg" cx="60" cy="60" r="52"/><circle class="g-arc" cx="60" cy="60" r="52"/></svg>
+          <span class="g-num">100</span>
+          <span class="g-label">SEO</span>
+        </div>
+        </div>
+        <div class="lh-legend"><span><i class="lg-red"></i>0–49</span><span><i class="lg-orange"></i>50–89</span><span><i class="lg-green"></i>90–100</span></div>
+        <div class="lh-run">
+          <button type="button" class="btn primary" id="lhRun">Run live test</button>
+          <p id="lhStatus" aria-live="polite">Last checked: October 2026 on the live site. Performance changes with network and device, so run it now to see today's real score.</p>
+        </div>
       </div>
-      <p class="lh-note">Google Lighthouse, October 2026. The first run scored 96 for accessibility because some light grey text was too faint to read easily. I darkened those colours and ran it again.</p>
+      <p class="lh-note">The test runs Google Lighthouse (mobile) on this site through PageSpeed Insights, the same tool anyone can use. You can also <a href="https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fsudhansushekhar.github.io%2Fsudhanshu-shekhar%2F" target="_blank" rel="noopener">open the full report</a>. The first run scored 96 for accessibility because some light grey text was too faint, so I darkened those colours.</p>
       <div class="checks">
         <div><h3>Screen sizes</h3><p>Checked at desktop and phone widths. Nothing scrolls sideways, and the menu folds into a button on small screens.</p></div>
         <div><h3>Keyboard</h3><p>Every link, button, tab and receipt line can be reached with Tab and used with Enter. Focus is always visible.</p></div>
@@ -778,7 +829,7 @@ test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included
 
 <script>
 /* Reveal on scroll */
-const revealEls=document.querySelectorAll('.head, .stats, .about > *, .skill, .job, .featured, .project, .lab-tabs, .post, .lh-score, .checks > div, .card, .contact');
+const revealEls=document.querySelectorAll('.head, .stats, .about > *, .skill, .job, .featured, .project, .lab-tabs, .post, .lh-report, .checks > div, .card, .contact');
 revealEls.forEach(el=>el.classList.add('reveal'));
 const ro=new IntersectionObserver((entries)=>{
   entries.forEach(e=>{ if(e.isIntersecting){ const t=e.target; t.classList.add('in'); ro.unobserve(t); setTimeout(()=>{t.classList.remove('reveal');t.style.transitionDelay='';},1100);} });
@@ -787,6 +838,74 @@ document.querySelectorAll('.skills,.projects,.posts,.edu').forEach(g=>{
   [...g.children].forEach((c,i)=>c.style.transitionDelay=(i%4*0.08)+'s');
 });
 revealEls.forEach(el=>ro.observe(el));
+
+/* Fireworks when every score is 100, like real Lighthouse */
+function fireworks(){
+  const cv=document.getElementById('lhFw'), box=cv.parentElement;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const dpr=window.devicePixelRatio||1, W=box.clientWidth, H=box.clientHeight;
+  cv.width=W*dpr; cv.height=H*dpr; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  const colors=['#0CCE6B','#FFA400','#4285F4','#EA4335','#FBBC05','#6CC3CC'];
+  let parts=[], bursts=0, start=performance.now();
+  function burst(){
+    const x=W*(.15+Math.random()*.7), y=H*(.15+Math.random()*.45), c=colors[bursts%colors.length];
+    for(let i=0;i<46;i++){const a=Math.PI*2*i/46, v=1.6+Math.random()*2.6;
+      parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,c});}
+    bursts++;
+  }
+  (function frame(t){
+    const el=t-start;
+    if(bursts<7 && el>bursts*260) burst();
+    ctx.clearRect(0,0,W,H);
+    parts=parts.filter(p=>p.life>0);
+    for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.045;p.vx*=.985;p.life-=.012;
+      ctx.globalAlpha=Math.max(p.life,0);ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,2.2,0,Math.PI*2);ctx.fill();}
+    ctx.globalAlpha=1;
+    if(el<4200||parts.length) requestAnimationFrame(frame); else ctx.clearRect(0,0,W,H);
+  })(start);
+}
+function checkPerfect(scores){
+  const perfect=scores.length===4&&scores.every(v=>v===100);
+  document.getElementById('lhPerfect').hidden=!perfect;
+  document.querySelector('.lh-report').classList.toggle('perfect',perfect);
+  if(perfect) fireworks();
+}
+
+/* Lighthouse gauges */
+const CIRC=2*Math.PI*52;
+function setGauge(g,score){
+  const num=g.querySelector('.g-num'), arc=g.querySelector('.g-arc');
+  g.classList.remove('green','orange','red','loading');
+  if(score==null||isNaN(score)){num.textContent='–';arc.style.strokeDasharray='0 '+CIRC;return;}
+  g.classList.add(score>=90?'green':score>=50?'orange':'red');
+  num.textContent=score;
+  arc.style.strokeDasharray=(CIRC*score/100)+' '+CIRC;
+}
+const gauges=[...document.querySelectorAll('.lh-gauge')];
+gauges.forEach(g=>setGauge(g,parseInt(g.dataset.score,10)));
+const lhBtn=document.getElementById('lhRun'), lhStatus=document.getElementById('lhStatus');
+lhBtn.addEventListener('click',async()=>{
+  lhBtn.disabled=true; lhBtn.textContent='Testing…';
+  lhStatus.textContent='Running Lighthouse on Google\'s servers. This takes about 20 to 40 seconds.';
+  gauges.forEach(g=>{g.classList.add('loading');g.querySelector('.g-num').textContent='';});
+  document.getElementById('lhPerfect').hidden=true; document.querySelector('.lh-report').classList.remove('perfect');
+  const api='https://www.googleapis.com/pagespeedonline/v5/runPagespeed?strategy=mobile'
+    +'&category=PERFORMANCE&category=ACCESSIBILITY&category=BEST_PRACTICES&category=SEO'
+    +'&url='+encodeURIComponent('https://sudhansushekhar.github.io/sudhanshu-shekhar/');
+  try{
+    const res=await fetch(api);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const cats=data.lighthouseResult.categories;
+    const got=gauges.map(g=>{const c=cats[g.dataset.key];const v=c&&c.score!=null?Math.round(c.score*100):null;setGauge(g,v);return v;});
+    checkPerfect(got);
+    lhStatus.textContent='Tested just now with Google PageSpeed Insights (mobile, Lighthouse '+(data.lighthouseResult.lighthouseVersion||'')+').';
+  }catch(e){
+    gauges.forEach(g=>setGauge(g,parseInt(g.dataset.score,10)));
+    lhStatus.innerHTML='Google\'s test service is busy right now. Try again in a minute, or <a href="https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fsudhansushekhar.github.io%2Fsudhanshu-shekhar%2F" target="_blank" rel="noopener">open the full report</a>.';
+  }
+  lhBtn.disabled=false; lhBtn.textContent='Run again';
+});
 
 /* Mobile menu */
 const menuBtn=document.getElementById('menuBtn'), navLinks=document.getElementById('navLinks');
