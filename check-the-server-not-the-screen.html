@@ -9,12 +9,14 @@
 <meta property="og:title" content="Why my tests check the server, not the screen">
 <meta property="og:description" content="Verifying invoices, GST and stock through the API catches the bugs a UI-only assertion misses.">
 <meta property="og:type" content="article">
+<meta property="og:image" content="https://sudhansushekhar.github.io/sudhanshu-shekhar/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#EEF1F5;--surface:#FFFFFF;--ink:#142033;--muted:#5A687C;--faint:#8794A6;--line:#D8DEE7;--accent:#1F6F78;--accent-soft:#E1EFF0;--code-bg:#142033;--code-ink:#DCE5F2;
+:root{--bg:#EEF1F5;--surface:#FFFFFF;--ink:#142033;--muted:#56647A;--faint:#5F6B7B;--line:#D8DEE7;--accent:#1F6F78;--accent-soft:#E1EFF0;--code-bg:#142033;--code-ink:#DCE5F2;
 --serif:"Newsreader",Georgia,serif;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#6F7E93;--line:#26344A;--accent:#6CC3CC;--accent-soft:#16323A;--code-bg:#0A101A}}
@@ -73,37 +75,37 @@ article > *{animation:rise .6s ease both}
   <span class="tagline">API testing</span>
   <h1>Why my tests check the server, not the screen</h1>
   <p class="dek">Verifying invoices, GST and stock through the API catches the bugs a UI-only assertion misses.</p>
-  <div class="meta"><div class="avatar" aria-hidden="true">SS</div><div><b>Sudhanshu Shekhar</b><span>Senior QA Automation Engineer · 4 min read · October 2026</span></div></div>
+  <div class="meta"><div class="avatar" aria-hidden="true">SS</div><div><b>Sudhanshu Shekhar</b><span>Senior QA Automation Engineer · 3 min read · October 2026</span></div></div>
   <div class="body">
-<p>Most UI tests end by checking something on the screen: a success message, a total, a receipt. If it looks right, the test passes. In retail POS testing, I've learned that this isn't enough. The screen shows what the frontend <em>thinks</em> happened. What matters is what the server actually booked.</p>
+<p>Most UI tests end by checking something on the screen: a success message, a total, a receipt. If it looks right, the test passes. In POS testing I learned that this is not enough. The screen shows what the frontend thinks happened. What really matters is what the server saved.</p>
 
 <h2>The screen can be right while the data is wrong</h2>
-<p>A POS screen can show a correct total and still save a wrong invoice. Some of the ways this happens:</p>
+<p>A POS screen can show the correct total and still save a wrong invoice. For example:</p>
 <ul>
-  <li>The frontend calculates tax one way, and the server recalculates it differently when the invoice is saved.</li>
-  <li>A discount looks applied on screen, but isn't saved with the invoice.</li>
-  <li>The receipt prints, but the invoice is stuck as a draft instead of paid.</li>
-  <li>The sale completes, but stock isn't deducted, or the invoice isn't linked to the right customer or payment.</li>
+  <li>The screen calculates tax one way, and the server calculates it differently when it saves the invoice.</li>
+  <li>A discount shows on screen but is not saved with the invoice.</li>
+  <li>The receipt prints, but the invoice is still a draft, not paid.</li>
+  <li>The sale goes through, but stock is not reduced, or the invoice is linked to the wrong customer.</li>
 </ul>
-<p>Each of these passes a UI-only test. Each of them is a real problem for a retailer: wrong tax filings, wrong stock counts, or money that doesn't reconcile at the end of the day.</p>
+<p>A test that only looks at the screen passes in all of these cases. For a shop, each one is a real problem: wrong tax, wrong stock, or cash that doesn't match at the end of the day.</p>
 
-<h2>The pattern: set up with the API, act in the UI, check the server</h2>
-<p>My tests follow one simple pattern:</p>
+<h2>How I write these tests</h2>
+<p>I follow the same three steps every time:</p>
 <ol>
-  <li><strong>Set up through the seed or the API.</strong> Items, prices, GST and tills are created directly. The setup screens aren't what's being tested, so there's no reason to click through them.</li>
-  <li><strong>Act through the UI.</strong> Do what a cashier does: add items, check out, take payment. This is the behaviour under test.</li>
+  <li><strong>Set up through the API.</strong> Items, prices, GST and tills are created directly. I'm not testing those setup screens, so there's no reason to click through them.</li>
+  <li><strong>Do the action in the UI.</strong> Do what a cashier does: add items, check out, take payment. This is the part being tested.</li>
   <li><strong>Check the server.</strong> Read back the record the sale created, by its name, and check what was saved.</li>
 </ol>
-<p>Here's part of a real test from my <a href="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation" target="_blank" rel="noopener">ERPNext POS framework</a>, <code>TC-POS-001</code>: a cashier sells one item for cash.</p>
+<p>Here is part of a real test from my <a href="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation" target="_blank" rel="noopener">ERPNext POS framework</a>, <code>TC-POS-001</code>, where a cashier sells one item for cash:</p>
 <pre><code><span class="k">const</span> stockBefore = <span class="k">await</span> api.stockQty(item.code, testData.warehouse)
 
-<span class="c">// Act: the sale, through the POS screen</span>
+<span class="c">// The sale, on the POS screen</span>
 <span class="k">await</span> pos.addItem(item)
 <span class="k">await</span> pos.checkout()
 <span class="k">await</span> pos.payWith(<span class="s">'Cash'</span>, String(price.gross))
 <span class="k">const</span> sale = <span class="k">await</span> pos.completeOrder()
 
-<span class="c">// Check: the invoice this sale booked, read back by its name</span>
+<span class="c">// Read back the invoice this sale created, by its name</span>
 <span class="k">const</span> invoice = <span class="k">await</span> api.getDoc(<span class="s">'Sales Invoice'</span>, sale.name)
 expect(invoice).toMatchObject({
   is_pos: 1,
@@ -116,31 +118,30 @@ expect(taxOn(invoice, testData.gst.cgstAccount)).toBe(price.halfGst)
 expect(taxOn(invoice, testData.gst.sgstAccount)).toBe(price.halfGst)
 expect(paidRows(invoice)).toEqual([{ mode: <span class="s">'Cash'</span>, amount: price.gross }])
 
-<span class="c">// Stock: exactly one fewer, and this invoice booked the -1</span>
+<span class="c">// Stock went down by exactly one</span>
 expect(<span class="k">await</span> api.stockQty(item.code, testData.warehouse)).toBe(stockBefore - 1)</code></pre>
-<p>The key detail is that the test takes the invoice name from the screen's own response and reads <em>that</em> invoice. It never searches for "the latest invoice", which could belong to another test.</p>
+<p>One detail matters a lot here. The test takes the invoice name from the screen's own response and reads that exact invoice. It never searches for "the latest invoice", because that could belong to another test running at the same time.</p>
 
-<h2>What I check on the server</h2>
-<p>For a POS sale, the test case lists exact values for the saved Sales Invoice:</p>
+<h2>What I check on the saved invoice</h2>
+<p>For a ₹118 item with 18% GST included, the test case lists the exact values:</p>
 <ul>
-  <li><strong>Status:</strong> it's a POS invoice and it's submitted, not left as a draft.</li>
-  <li><strong>Money:</strong> net ₹100.00, CGST ₹9.00, SGST ₹9.00 and grand total ₹118.00 for an item sold at ₹118 with 18% GST included.</li>
+  <li><strong>Status:</strong> it is a POS invoice and it is submitted, not a draft.</li>
+  <li><strong>Amounts:</strong> net ₹100.00, CGST ₹9.00, SGST ₹9.00, grand total ₹118.00.</li>
   <li><strong>Payment:</strong> one payment row, Cash ₹118.00. For UPI or card sales, the transaction ID or card details are saved too.</li>
   <li><strong>Links:</strong> the right customer, cashier and till.</li>
-  <li><strong>Stock:</strong> exactly one lower, and the stock movement booked by that invoice is −1.</li>
+  <li><strong>Stock:</strong> exactly one less, and the stock entry made by this invoice is −1.</li>
 </ul>
-<p>At work, the same idea covers pricing, discounts, stock deduction and payment flows. If a sale should reduce stock, the test checks the stock level, not a message saying "sale complete".</p>
+<p>At work I use the same idea for pricing, discounts, stock and payments. If a sale should reduce stock, the test checks the stock number, not a "sale complete" message.</p>
 
-<h2>A bonus: faster, more stable tests</h2>
-<p>Moving setup to the API wasn't only about better checks. It made the whole suite faster and less flaky. At iVend Retail, replacing UI-driven login and data creation with API calls cut suite runtime by about 30%. Fewer clicks means fewer places for timing issues, and each test spends its time on the behaviour that matters.</p>
+<h2>A side benefit: faster tests</h2>
+<p>Doing the setup through the API also made the tests faster and less flaky. At iVend Retail, moving login and data creation from the UI to API calls cut the suite runtime by about 30%. Fewer clicks means fewer timing problems.</p>
 
-<h2>When the screen still matters</h2>
-<p>This doesn't mean UI checks are useless, and my own framework taught me that the hard way. At one point I checked every total through the API only. But the POS <strong>screen</strong> applied a default tax template that the API didn't, so the POS added an extra 6% tax (₹100.00 became ₹106.00) while every API check said ₹100.00. The server checks were green; a real customer would have been overcharged.</p>
-<p>So <code>TC-POS-001</code> checks both: the cart must show Net Total ₹100.00, CGST ₹9.00, SGST ₹9.00 and Grand Total ₹118.00, and the saved invoice must have the same values. A good test confirms that the two agree.</p>
-<div class="callout"><p>The screen is what the user sees. The server is what the business keeps. Test both, and make sure they agree.</p></div>
+<h2>The screen still matters</h2>
+<p>I don't skip UI checks, and my own project showed me why. At one point I checked every total through the API only. But the POS screen was adding a default tax template that the API did not. The screen added an extra 6% tax, so ₹100.00 became ₹106.00, while every API check still said ₹100.00. All my server checks were green, and a real customer would have paid too much.</p>
+<p>So now <code>TC-POS-001</code> checks both. The cart must show Net Total ₹100.00, CGST ₹9.00, SGST ₹9.00 and Grand Total ₹118.00, and the saved invoice must have the same values. The test makes sure the screen and the server agree.</p>
 
-<h2>Try it on your own suite</h2>
-<p>Pick one end-to-end test that ends with a UI check. Add one API call at the end that fetches the record it created and checks a few key fields. There's a good chance you'll find something the screen was hiding.</p>
+<h2>Try it on one of your tests</h2>
+<p>Pick one end-to-end test that ends with a UI check. Add one API call at the end that reads the record it created and checks a few fields. You might be surprised by what turns up.</p>
 
   </div>
   <div class="end">
