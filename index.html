@@ -103,8 +103,8 @@ h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-.015em;margin:
 .stat{padding:1.4rem 1.5rem;border-left:1px solid var(--line)}
 .stat:first-child{border-left:none}
 .stat strong{display:block;font-family:var(--serif);font-weight:500;font-size:2.1rem;line-height:1.1}
-.stat span{color:var(--muted);font-size:.93rem}
-@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}.stat:nth-child(3){border-left:none}.stat:nth-child(n+3){border-top:1px solid var(--line)}}
+.stat span{display:block;margin-top:.25rem;color:var(--muted);font-size:.93rem;line-height:1.4}
+@media (max-width:760px){.stat{padding:1.1rem 1rem}.stat strong{font-size:1.4rem}.stats{grid-template-columns:1fr 1fr}.stat:nth-child(3){border-left:none}.stat:nth-child(n+3){border-top:1px solid var(--line)}}
 
 /* ---------- Sections ---------- */
 section{padding:5rem 0}
@@ -396,7 +396,7 @@ footer a{color:var(--muted)}
           <div><b>Career highlights</b><span>Senior QA Automation Engineer, iVend Retail</span></div>
         </div>
         <ul class="hl-list">
-          <li><i>✓</i><div><b>Moved 400+ tests to Playwright</b><span>Migrated POS and ERP tests from Katalon without stopping releases</span></div></li>
+          <li><i>✓</i><div><b>Moved POS tests to Playwright</b><span>Completed the Katalon to Playwright migration at iVend Retail, with releases covered throughout</span></div></li>
           <li><i>✓</i><div><b>Full regression in 50 minutes</b><span>Automated runs on GitHub Actions for every release</span></div></li>
           <li><i>✓</i><div><b>30% faster test runs</b><span>Replaced slow UI setup steps with API calls</span></div></li>
           <li><i>✓</i><div><b>Checks real data, not just the screen</b><span>Verifies invoices, GST and stock on the server</span></div></li>
@@ -406,10 +406,10 @@ footer a{color:var(--muted)}
     </div>
 
     <div class="stats">
-      <div class="stat"><strong>5+ yrs</strong><span>testing retail POS and ERP</span></div>
-      <div class="stat"><strong>400+</strong><span>scenarios migrated to Playwright</span></div>
-      <div class="stat"><strong>~1,200</strong><span>automated tests built</span></div>
-      <div class="stat"><strong>30%</strong><span>faster suite via API setup</span></div>
+      <div class="stat"><strong>5+ years</strong><span>in QA and test automation</span></div>
+      <div class="stat"><strong>4 domains</strong><span>retail POS, ERP, telecom and HR</span></div>
+      <div class="stat"><strong>~1,200 tests</strong><span>automated and maintained</span></div>
+      <div class="stat"><strong>8 certifications</strong><span>including Katalon Expert</span></div>
     </div>
   </div>
 
@@ -419,9 +419,9 @@ footer a{color:var(--muted)}
       <div class="head"><h2>About</h2><p>From mechanical engineering to test automation, with a focus on reliable regression suites.</p></div>
       <div class="about">
         <div>
-          <p>I'm a QA Automation Engineer with 5+ years of experience testing retail POS and ERP systems. At iVend Retail I'm moving our POS test automation from Katalon to Playwright (JavaScript).</p>
+          <p>I'm a QA Automation Engineer with 5+ years of experience testing retail POS and ERP systems. At iVend Retail I moved our POS and ERP test automation from Katalon to Playwright (JavaScript).</p>
           <p>When I test a sale, I don't only look at the screen. My tests also check the invoice the server saved: its status, the GST and the stock. The tests run in GitHub Actions, where we can pick the suite, the environment and the browser for each run. When a test fails only in CI, I find the real cause and fix it instead of adding retries. That's what makes the results good enough for release sign-off.</p>
-          <p>I have a B.Tech in Mechanical Engineering and moved into software testing in 2021. Since then I have worked on retail, telecom, HR scheduling and ERP products. Lately I've been using AI coding agents to write tests, with lint rules and reviews to catch their mistakes.</p>
+          <p>I have a Bachelor of Engineering (B.E.) in Mechanical Engineering and moved into software testing in 2021. Since then I have worked on retail, telecom, HR scheduling and ERP products. Lately I've been using AI coding agents to write tests, with lint rules and reviews to catch their mistakes.</p>
         </div>
         <div class="focus">
           <h3>What I bring to a team</h3>
@@ -491,7 +491,7 @@ footer a{color:var(--muted)}
           </div>
         </li>
         <li class="job">
-          <div class="when">Aug 2021 – Oct 2021<small>Internship</small></div>
+          <div class="when">Sep 2021 – Oct 2021<small>Internship</small></div>
           <div>
             <h3>Automation QA Intern</h3>
             <div class="org">BirchStreet Systems (GDI)</div>
@@ -698,7 +698,7 @@ test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included
         </a>
         <a class="post" href="katalon-to-playwright-migration.html">
           <span class="post-tag">Test automation</span>
-          <h3>Migrating 400+ scenarios from Katalon to Playwright</h3>
+          <h3>Moving a large POS test suite from Katalon to Playwright</h3>
           <p>How to move a large POS suite without a freeze, keeping both suites running until the new one earns trust.</p>
           <span class="read"><span>Read article</span><small>3 min read</small></span>
         </a>
@@ -732,7 +732,7 @@ test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included
         </div>
         <div class="card">
           <h3>Education</h3>
-          <div class="cert"><b>B.Tech, Mechanical Engineering<br><span style="font-weight:400">Pune University</span></b><span>Dec 2016</span></div>
+          <div class="cert"><b>Bachelor of Engineering (B.E.), Mechanical Engineering<br><span style="font-weight:400">Savitribai Phule Pune University</span></b><span>2012 – 2016</span></div>
         </div>
       </div>
     </div>
