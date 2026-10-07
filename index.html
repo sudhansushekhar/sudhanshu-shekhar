@@ -206,6 +206,20 @@ table{border-collapse:collapse;width:100%;min-width:620px;font-size:.94rem}
 th,td{text-align:left;padding:.7rem .75rem;border-bottom:1px solid var(--line);vertical-align:top}
 th{color:var(--muted);font-weight:600;font-size:.88rem}
 td.p{color:var(--pass);font-weight:600}td.f{color:var(--fail);font-weight:600}
+.tc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;margin-bottom:1.6rem}
+.tc h4{font-family:var(--serif);font-weight:500;font-size:1.25rem;line-height:1.35;margin:0 0 .9rem}
+.tc-id{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:.15rem .5rem;border-radius:6px;margin-right:.4rem;vertical-align:.15em}
+.tc-meta{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem}
+.tc-meta span{font-size:.86rem;border:1px solid var(--line);border-radius:8px;padding:.2rem .6rem;background:var(--bg)}
+.tc-meta b{color:var(--muted);font-weight:500;margin-right:.3rem}
+.tc-data,.tc-change{font-size:.94rem;color:var(--muted);margin:0 0 1rem}
+.tc-change{margin:1rem 0 0;padding-top:.9rem;border-top:1px dashed var(--line)}
+.tc-grid{display:grid;grid-template-columns:1fr 1.6fr;gap:1.5rem}
+.tc h5,.tc-more{font-family:var(--sans);font-size:.95rem;font-weight:600;margin:0 0 .5rem}
+.tc-more{margin-bottom:.8rem}
+.tc ol,.tc ul{margin:0;padding-left:1.2rem;font-size:.95rem}.tc li{margin-bottom:.4rem}
+.tc code{font-family:var(--mono);font-size:.85em;background:var(--accent-soft);padding:.05em .3em;border-radius:4px}
+@media (max-width:760px){.tc-grid{grid-template-columns:1fr}}
 .code{background:var(--code-bg);color:var(--code-ink);font:.84rem/1.7 var(--mono);padding:1.2rem 1.3rem;border-radius:12px;overflow-x:auto;margin:0}
 .code .k{color:#8FB4FF}.code .s{color:#9FDDB0}.code .c{color:#7C8BA3}
 @media (max-width:560px){.kv{grid-template-columns:1fr}.kv dt{margin-top:.6rem}}
@@ -499,7 +513,7 @@ footer a{color:var(--muted)}
         <button class="tab" role="tab" aria-selected="true" aria-controls="p-hunt" id="t-hunt">Bug hunt</button>
         <button class="tab" role="tab" aria-selected="false" aria-controls="p-bug" id="t-bug">Bug report</button>
         <button class="tab" role="tab" aria-selected="false" aria-controls="p-cases" id="t-cases">Test cases</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p-code" id="t-code">Playwright code</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-code" id="t-code">Playwright test</button>
       </div>
 
       <div class="panel" role="tabpanel" id="p-hunt" aria-labelledby="t-hunt">
@@ -548,38 +562,68 @@ footer a{color:var(--muted)}
       </div>
 
       <div class="panel" role="tabpanel" id="p-cases" aria-labelledby="t-cases" hidden>
-        <p class="panel-intro">POS sale with GST: a slice of a test case sheet, traced to requirement IDs.</p>
+        <p class="panel-intro">A real test case from my <a href="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation/blob/main/docs/test-cases/pos-sale.md" target="_blank" rel="noopener">ERPNext POS framework</a>. Every test case is written in plain English first; the automated test's title is its exact heading.</p>
+        <div class="tc">
+          <h4><span class="tc-id">TC-POS-001</span> a cashier sells one item for cash: GST included, booked as a POS sales invoice</h4>
+          <div class="tc-meta">
+            <span><b>Requirement</b> REQ-POS-004, 008, 009, 015</span>
+            <span><b>Priority</b> P0</span>
+            <span><b>Severity</b> blocker</span>
+            <span><b>Runs</b> @smoke</span>
+          </div>
+          <p class="tc-data"><b>Test data:</b> QA-STOCK-001 (₹118.00, GST 18%, stock in Stores - QAR), Walk-in Customer, Till 1</p>
+          <div class="tc-grid">
+            <div><h5>Steps</h5><ol><li>Add 1 × QA-STOCK-001 to the cart.</li><li>Checkout. Pay ₹118.00 by <b>Cash</b>. Complete Order.</li></ol></div>
+            <div><h5>Checks</h5><ul>
+              <li>The cart shows Net Total ₹100.00, CGST ₹9.00, SGST ₹9.00, Grand Total ₹118.00.</li>
+              <li>The Sales Invoice the screen submitted, read back by name: <code>is_pos</code> 1, submitted, customer Walk-in Customer, net ₹100.00, CGST ₹9.00, SGST ₹9.00, grand total ₹118.00, one payment row Cash ₹118.00, POS profile Till 1.</li>
+              <li>Stock of QA-STOCK-001 in Stores - QAR is exactly <b>1 lower</b>, and the stock movement booked by that invoice is <b>−1</b>.</li>
+            </ul></div>
+          </div>
+          <p class="tc-change"><b>Change it when</b> the POS payment screen, GST setup, POS profile or stock settings change.</p>
+        </div>
+        <h5 class="tc-more">More test cases in the suite</h5>
         <table>
-          <thead><tr><th>ID</th><th>Req</th><th>Scenario</th><th>Expected result</th><th>Status</th></tr></thead>
+          <thead><tr><th>ID</th><th>Test case</th><th>Requirement</th><th>Priority</th><th>Severity</th></tr></thead>
           <tbody>
-            <tr><td>TC-01</td><td>PRD-12</td><td>Sell one taxable item, pay by cash</td><td>Invoice status Paid; GST matches item tax template</td><td class="p">Pass</td></tr>
-            <tr><td>TC-02</td><td>PRD-14</td><td>Apply 10% discount before tax</td><td>GST computed on discounted amount</td><td class="p">Pass</td></tr>
-            <tr><td>TC-03</td><td>PRD-15</td><td>Sell quantity above available stock</td><td>Sale blocked with clear stock message</td><td class="f">Fail</td></tr>
-            <tr><td>TC-04</td><td>PRD-18</td><td>Split payment: cash + card</td><td>Both payment modes recorded; outstanding ₹0</td><td class="p">Pass</td></tr>
-            <tr><td>TC-05</td><td>PRD-21</td><td>Return one item from a paid invoice</td><td>Credit note created; stock restored</td><td class="p">Pass</td></tr>
+            <tr><td>TC-POS-002</td><td>a cashier sells by UPI: the transaction ID is saved with the sale</td><td>REQ-POS-011, 013, 015</td><td>P0</td><td>blocker</td></tr>
+            <tr><td>TC-POS-003</td><td>a card payment without its last 4 digits is refused at Complete Order</td><td>REQ-POS-012</td><td>P1</td><td>critical</td></tr>
+            <tr><td>TC-POS-004</td><td>a card sale keeps the card type, last 4 digits and approval code</td><td>REQ-POS-011, 012, 015</td><td>P1</td><td>critical</td></tr>
+            <tr><td>TC-POS-005</td><td>the number pad takes whole rupees and paise</td><td>REQ-POS-010</td><td>P2</td><td>major</td></tr>
+            <tr><td>TC-SIGNIN-003</td><td>a cashier signs in straight to the Point of Sale, ready to open the till</td><td>REQ-POS-017</td><td>P0</td><td>blocker</td></tr>
           </tbody>
         </table>
       </div>
 
       <div class="panel" role="tabpanel" id="p-code" aria-labelledby="t-code" hidden>
-        <p class="panel-intro">Setup through the API, action through the UI, verification against what the server booked.</p>
-<pre class="code"><span class="k">import</span> { test, expect } <span class="k">from</span> <span class="s">'../fixtures'</span>;
+        <p class="panel-intro">The automated test for TC-POS-001 (shortened), from <a href="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation/blob/main/tests/pos/sale.spec.js" target="_blank" rel="noopener">tests/pos/sale.spec.js</a>. The sale happens on the screen; the checks read back what the server booked.</p>
+<pre class="code"><span class="k">const</span> { test, expect, meta } = require(<span class="s">'../../src/fixtures'</span>)
 
-test(<span class="s">'POS sale books correct GST on the server @smoke'</span>, <span class="k">async</span> ({ posPage, api }) =&gt; {
-  <span class="c">// Arrange: create test data through the API, not the UI</span>
-  <span class="k">const</span> item = <span class="k">await</span> api.createItem({ rate: 1000, taxTemplate: <span class="s">'GST 18%'</span> });
+test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included, booked as a POS sales invoice'</span>,
+  { tag: [<span class="s">'@smoke'</span>] }, <span class="k">async</span> ({ pos, till, api, testData }) =&gt; {
+  meta({ priority: <span class="s">'P0'</span>, severity: <span class="s">'blocker'</span>, feature: <span class="s">'POS'</span>, story: <span class="s">'REQ-POS-004'</span> })
+  <span class="k">const</span> item = testData.items.stock
+  <span class="k">const</span> price = gstSplit(item)
+  <span class="k">const</span> stockBefore = <span class="k">await</span> api.stockQty(item.code, testData.warehouse)
 
-  <span class="c">// Act: complete the sale in the POS screen</span>
-  <span class="k">await</span> posPage.addToCart(item.code, 2);
-  <span class="k">const</span> invoiceName = <span class="k">await</span> posPage.payWithCash();
+  <span class="c">// The screen: cart totals</span>
+  <span class="k">await</span> pos.addItem(item)
+  expect(<span class="k">await</span> pos.totals()).toMatchObject({
+    <span class="s">'Net Total'</span>: rupees(price.net), CGST: rupees(price.halfGst),
+    SGST: rupees(price.halfGst), <span class="s">'Grand Total'</span>: rupees(price.gross),
+  })
+  <span class="k">await</span> pos.checkout()
+  <span class="k">await</span> pos.payWith(<span class="s">'Cash'</span>, String(price.gross))
+  <span class="k">const</span> sale = <span class="k">await</span> pos.completeOrder()
 
-  <span class="c">// Assert: trust the server, not just the screen</span>
-  <span class="k">const</span> invoice = <span class="k">await</span> api.getInvoice(invoiceName);
-  expect(invoice.status).toBe(<span class="s">'Paid'</span>);
-  expect(invoice.total_taxes_and_charges).toBe(360);
-  expect(invoice.grand_total).toBe(2360);
-});</pre>
+  <span class="c">// The server: the invoice this sale booked, read back by its name</span>
+  <span class="k">const</span> invoice = <span class="k">await</span> api.getDoc(<span class="s">'Sales Invoice'</span>, sale.name)
+  expect(invoice).toMatchObject({ is_pos: 1, docstatus: 1, grand_total: price.gross })
+  expect(paidRows(invoice)).toEqual([{ mode: <span class="s">'Cash'</span>, amount: price.gross }])
+  expect(<span class="k">await</span> api.stockQty(item.code, testData.warehouse)).toBe(stockBefore - 1)
+})</pre>
       </div>
+    </div>
     </div>
   </section>
 
@@ -592,7 +636,7 @@ test(<span class="s">'POS sale books correct GST on the server @smoke'</span>, <
           <span class="post-tag">QA + AI</span>
           <h3>Letting an AI agent write Playwright tests, safely</h3>
           <p>Lint rules, edit hooks and mutation checks that keep AI-written tests traceable to requirements and able to fail.</p>
-          <span class="read"><span>Read article</span><small>4 min read</small></span>
+          <span class="read"><span>Read article</span><small>6 min read</small></span>
         </a>
         <a class="post" href="katalon-to-playwright-migration.html">
           <span class="post-tag">Test automation</span>
@@ -604,7 +648,7 @@ test(<span class="s">'POS sale books correct GST on the server @smoke'</span>, <
           <span class="post-tag">API testing</span>
           <h3>Why my tests check the server, not the screen</h3>
           <p>Verifying invoices, GST and stock through the API catches the bugs a UI-only assertion misses.</p>
-          <span class="read"><span>Read article</span><small>3 min read</small></span>
+          <span class="read"><span>Read article</span><small>4 min read</small></span>
         </a>
       </div>
     </div>
