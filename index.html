@@ -215,7 +215,12 @@ td.p{color:var(--pass);font-weight:600}td.f{color:var(--fail);font-weight:600}
 .post{border:1px solid var(--line);border-radius:var(--radius);padding:1.5rem;background:var(--bg);display:flex;flex-direction:column}
 .post h3{font-size:1.3rem;line-height:1.25;margin-bottom:.6rem}
 .post p{color:var(--muted);margin:0 0 1rem;font-size:.97rem}
-.post .soon{margin-top:auto;font-size:.88rem;color:var(--faint);font-weight:500}
+.post{text-decoration:none;color:var(--ink)}
+.post-tag{align-self:flex-start;font-size:.8rem;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:.15rem .6rem;border-radius:999px;margin-bottom:.9rem}
+.post .read{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:.9rem;border-top:1px solid var(--line);font-weight:600;font-size:.93rem;color:var(--accent)}
+.post .read small{color:var(--faint);font-weight:500}
+.post .read span{transition:transform .2s}
+.post:hover .read span{transform:translateX(4px)}
 
 /* Education + certs */
 .edu{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
@@ -581,23 +586,26 @@ test(<span class="s">'POS sale books correct GST on the server @smoke'</span>, <
   <!-- WRITING -->
   <section id="writing" class="alt">
     <div class="wrap">
-      <div class="head"><h2>Writing on QA + AI</h2><p>Notes from building real frameworks. New posts are on the way; follow me on LinkedIn to catch them.</p></div>
+      <div class="head"><h2>Writing on QA + AI</h2><p>Notes from building real test frameworks: what worked, what broke, and what I'd do again.</p></div>
       <div class="posts">
-        <article class="post">
+        <a class="post" href="ai-agent-playwright-tests.html">
+          <span class="post-tag">QA + AI</span>
           <h3>Letting an AI agent write Playwright tests, safely</h3>
           <p>Lint rules, edit hooks and mutation checks that keep AI-written tests traceable to requirements and able to fail.</p>
-          <span class="soon">Coming soon</span>
-        </article>
-        <article class="post">
+          <span class="read"><span>Read article</span><small>4 min read</small></span>
+        </a>
+        <a class="post" href="katalon-to-playwright-migration.html">
+          <span class="post-tag">Test automation</span>
           <h3>Migrating 400+ scenarios from Katalon to Playwright</h3>
           <p>How to move a large POS suite without a freeze, keeping both suites running until the new one earns trust.</p>
-          <span class="soon">Coming soon</span>
-        </article>
-        <article class="post">
+          <span class="read"><span>Read article</span><small>3 min read</small></span>
+        </a>
+        <a class="post" href="check-the-server-not-the-screen.html">
+          <span class="post-tag">API testing</span>
           <h3>Why my tests check the server, not the screen</h3>
           <p>Verifying invoices, GST and stock through the API catches the bugs a UI-only assertion misses.</p>
-          <span class="soon">Coming soon</span>
-        </article>
+          <span class="read"><span>Read article</span><small>3 min read</small></span>
+        </a>
       </div>
     </div>
   </section>
