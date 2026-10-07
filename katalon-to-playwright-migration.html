@@ -9,12 +9,14 @@
 <meta property="og:title" content="Migrating 400+ scenarios from Katalon to Playwright">
 <meta property="og:description" content="How to move a large POS suite without a freeze, keeping both suites running until the new one earns trust.">
 <meta property="og:type" content="article">
+<meta property="og:image" content="https://sudhansushekhar.github.io/sudhanshu-shekhar/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#EEF1F5;--surface:#FFFFFF;--ink:#142033;--muted:#5A687C;--faint:#8794A6;--line:#D8DEE7;--accent:#1F6F78;--accent-soft:#E1EFF0;--code-bg:#142033;--code-ink:#DCE5F2;
+:root{--bg:#EEF1F5;--surface:#FFFFFF;--ink:#142033;--muted:#56647A;--faint:#5F6B7B;--line:#D8DEE7;--accent:#1F6F78;--accent-soft:#E1EFF0;--code-bg:#142033;--code-ink:#DCE5F2;
 --serif:"Newsreader",Georgia,serif;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#6F7E93;--line:#26344A;--accent:#6CC3CC;--accent-soft:#16323A;--code-bg:#0A101A}}
@@ -75,58 +77,57 @@ article > *{animation:rise .6s ease both}
   <p class="dek">How to move a large POS suite without a freeze, keeping both suites running until the new one earns trust.</p>
   <div class="meta"><div class="avatar" aria-hidden="true">SS</div><div><b>Sudhanshu Shekhar</b><span>Senior QA Automation Engineer · 3 min read · October 2026</span></div></div>
   <div class="body">
-<p>At iVend Retail I'm moving our POS and ERP regression suite from Katalon Studio to Playwright (JavaScript). So far that's more than 400 scenarios. The hardest part of a migration like this isn't writing the new tests. It's making sure the product stays protected the whole time you're doing it.</p>
-<p>Here's how I approached it, and what I'd tell anyone planning the same move.</p>
+<p>At iVend Retail I'm moving our POS and ERP regression tests from Katalon Studio to Playwright with JavaScript. So far that is more than 400 scenarios. Writing the new tests is not the hard part. The hard part is keeping releases safe while the move is still going on.</p>
+<p>These are the things that worked for me.</p>
 
-<h2>Rule 1: never stop the old suite</h2>
-<p>The biggest risk in a test migration is a gap: a period where the old suite is switched off and the new one isn't ready. Releases don't pause for your migration.</p>
-<p>So both suites kept running side by side. Katalon kept guarding every release, and Playwright grew next to it. A scenario was only retired from Katalon once its Playwright version had run reliably over multiple cycles and caught the same things. The new suite had to earn trust before it took over.</p>
-<div class="callout"><p>Run old and new in parallel. Retire a test only when its replacement has proven itself, not when it's merely written.</p></div>
+<h2>1. Keep the old suite running</h2>
+<p>The biggest risk in a migration is a gap: the old tests are switched off and the new ones are not ready yet. Releases don't wait for you to finish.</p>
+<p>So we ran both suites side by side. Katalon kept checking every release, and the Playwright suite grew next to it. I only removed a scenario from Katalon after its Playwright version had passed reliably for several runs. Being written was not enough. It had to prove itself first.</p>
 
-<h2>Rule 2: build the foundation before migrating tests</h2>
-<p>It's tempting to start converting tests on day one, because it shows visible progress. I started with the shared building blocks instead, because every one of the 400 tests would depend on them:</p>
+<h2>2. Build the common parts first</h2>
+<p>It's tempting to start converting tests on day one, because the progress is easy to show. I started with the shared pieces instead, because all 400 tests would use them:</p>
 <ul>
   <li><strong>Login</strong>, done once and shared, not repeated in every test</li>
-  <li><strong>POS actions</strong> like adding items, applying discounts and taking payment, as page objects</li>
-  <li><strong>An API client</strong> for creating test data and checking results on the server</li>
-  <li><strong>Test data helpers</strong>, so each test creates exactly what it needs</li>
-  <li><strong>Logging</strong>, so a failure in CI explains itself</li>
+  <li><strong>POS actions</strong> like adding items, discounts and payment, as page objects</li>
+  <li><strong>API calls</strong> for creating test data and checking results</li>
+  <li><strong>Test data helpers</strong>, so each test creates only what it needs</li>
+  <li><strong>Logging</strong>, so a failure in CI tells you what happened</li>
 </ul>
-<p>Playwright fixtures made this clean. A test asks for what it needs, such as a logged-in POS page or an API client, and the fixture handles setup and cleanup.</p>
+<p>Playwright fixtures made this simple. A test asks for what it needs, like a logged-in POS page, and the fixture does the setup and the cleanup.</p>
 
-<h2>Rule 3: migrate, don't translate</h2>
-<p>A line-by-line translation of a Katalon test gives you a Playwright test with all the old problems. Recorded tests often carry habits like fixed waits, long UI-driven setup and assertions on whatever text was visible.</p>
-<p>So each scenario was redesigned, not copied. The biggest change was setup. Many old tests logged in and created data through the UI before they even reached the thing being tested. I replaced that with API calls: log in once through the API and share the session state, and create test data directly. That one change cut suite runtime by about 30%.</p>
+<h2>3. Rewrite the test, don't copy it</h2>
+<p>If you copy a Katalon test line by line, you get a Playwright test with the same old problems: fixed waits, long setup through the screens, and checks on whatever text happened to be visible.</p>
+<p>So I rewrote each scenario. The biggest change was the setup. Many old tests logged in and created their data through the UI before they even got to the part being tested. I moved that to the API: log in once and share the session, and create data directly. That one change made the suite about 30% faster.</p>
 <pre><code><span class="c">// Before: every test logs in through the UI</span>
 <span class="k">await</span> page.goto(<span class="s">'/login'</span>);
 <span class="k">await</span> page.fill(<span class="s">'#email'</span>, user);  <span class="c">// ...and so on</span>
 
-<span class="c">// After: log in once via API, reuse the session everywhere</span>
+<span class="c">// After: log in once, reuse the saved session in every test</span>
 <span class="c">// playwright.config.js</span>
 use: { storageState: <span class="s">'.auth/cashier.json'</span> }</code></pre>
 
-<h2>Rule 4: migrate by risk, not by folder</h2>
-<p>I didn't migrate in the order tests happened to sit in the Katalon project. I started with the flows where a bug costs the business most: sign-in, sales, pricing, GST, discounts, stock and payment. Those got the strongest coverage in the new suite first, so the riskiest areas were the first to benefit from faster, more reliable tests.</p>
+<h2>4. Start with what matters most</h2>
+<p>I didn't go folder by folder. I started with the flows where a bug costs the business the most: sign-in, sales, pricing, GST, discounts, stock and payment. Those got good coverage in the new suite first.</p>
 
-<h2>Rule 5: make CI flexible and fix failures at the root</h2>
-<p>The suite runs in GitHub Actions, with options to pick the suite, the environment and the browser for each run. That means a developer can run a quick check on one module, while a release gets the full regression. The full regression suite completes in about 50 minutes.</p>
-<p>The hardest bugs were failures that only happened in CI. They passed on my machine every time. The causes turned out to be things like:</p>
+<h2>5. Make CI flexible, and fix flaky tests properly</h2>
+<p>The suite runs in GitHub Actions. For each run you can choose the suite, the environment and the browser. A developer can run a quick check on one module, and a release gets the full regression, which takes about 50 minutes.</p>
+<p>The hardest problems were tests that failed only in CI. On my machine they passed every time. The causes turned out to be:</p>
 <ul>
-  <li>cookie and session handling that behaved differently in the CI environment</li>
-  <li>Docker environment configuration</li>
-  <li>browser-specific timing differences</li>
+  <li>cookies and sessions behaving differently in CI</li>
+  <li>Docker environment settings</li>
+  <li>timing differences between browsers</li>
 </ul>
-<p>The easy fix is to add retries and move on. I avoided that. Retries hide problems, and a suite that "usually passes" can't be used to sign off a release. Fixing each root cause is slower, but it's what made the suite stable enough that the team trusts its results.</p>
+<p>The easy way out is to add retries. I didn't do that. Retries hide problems, and you can't sign off a release with a suite that "usually passes". Finding the real cause takes longer, but that's what made the team trust the results.</p>
 
-<h2>What I'd tell someone starting this</h2>
+<h2>If you are planning the same move</h2>
 <ol>
-  <li>Keep the old suite running until the new one has earned its place.</li>
-  <li>Build shared components and fixtures before converting tests.</li>
-  <li>Redesign each test, especially its setup. Use the API wherever the UI isn't the thing being tested.</li>
+  <li>Keep the old suite running until the new one has proved itself.</li>
+  <li>Build the shared parts and fixtures before converting tests.</li>
+  <li>Rewrite each test, especially the setup. Use the API wherever the UI is not what you are testing.</li>
   <li>Start with the flows that cost the most when they break.</li>
-  <li>Treat flaky tests as bugs to fix, not noise to retry.</li>
+  <li>Treat a flaky test as a bug to fix, not noise to retry.</li>
 </ol>
-<p>A migration is a chance to fix years of habits, not just change tools. Done carefully, you end up with a suite that's faster, cleaner and, most importantly, trusted.</p>
+<p>A migration is a good chance to get rid of old habits, not just to change tools.</p>
 
   </div>
   <div class="end">

@@ -9,6 +9,13 @@
 <meta property="og:title" content="Sudhanshu Shekhar | Senior QA Automation Engineer">
 <meta property="og:description" content="Playwright, API and CI/CD test automation for retail POS and ERP. Explore the QA Lab, test framework and work samples.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://sudhansushekhar.github.io/sudhanshu-shekhar/">
+<meta property="og:image" content="https://sudhansushekhar.github.io/sudhanshu-shekhar/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Sudhanshu Shekhar, Senior QA Automation Engineer">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sudhansushekhar.github.io/sudhanshu-shekhar/og-image.png">
 <meta name="theme-color" content="#EEF1F5">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,8 +23,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#142033; --muted:#5A687C; --faint:#8794A6;
-  --line:#D8DEE7; --accent:#1F6F78; --accent-soft:#E1EFF0; --pass:#1E7A4F; --fail:#B33A2B; --warn:#A46B00;
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#142033; --muted:#56647A; --faint:#5F6B7B;
+  --line:#D8DEE7; --accent:#1F6F78; --accent-soft:#E1EFF0; --pass:#17663F; --fail:#B33A2B; --warn:#A46B00;
   --code-bg:#142033; --code-ink:#DCE5F2;
   --serif:"Newsreader",Georgia,"Times New Roman",serif;
   --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -27,10 +34,10 @@
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#6F7E93;--line:#26344A;
+  --bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#8695AA;--line:#26344A;
   --accent:#6CC3CC;--accent-soft:#16323A;--pass:#5CC48E;--fail:#F0806E;--warn:#E3B34A;--code-bg:#0A101A;}}
 :root[data-theme="dark"]{
-  --bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#6F7E93;--line:#26344A;
+  --bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#8695AA;--line:#26344A;
   --accent:#6CC3CC;--accent-soft:#16323A;--pass:#5CC48E;--fail:#F0806E;--warn:#E3B34A;--code-bg:#0A101A;}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px)}
@@ -140,6 +147,9 @@ section{padding:5rem 0}
 /* Projects */
 .featured{display:grid;grid-template-columns:1.3fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:1rem}
 .featured .body{padding:2.2rem}
+.badges{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:1rem}
+.badges .label{margin-bottom:0}
+.badges img{display:block;height:20px}
 .label{display:inline-block;font-size:.82rem;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:.2rem .65rem;border-radius:999px;margin-bottom:1rem}
 .featured h3{font-size:1.9rem;line-height:1.15;margin-bottom:.8rem}
 .featured p{color:var(--muted);margin:0 0 1.2rem}
@@ -243,8 +253,18 @@ td.p{color:var(--pass);font-weight:600}td.f{color:var(--fail);font-weight:600}
 .cert{display:flex;justify-content:space-between;gap:1rem;padding:.75rem 0;border-top:1px solid var(--line)}
 .cert:first-of-type{border-top:none}
 .cert span{color:var(--muted);white-space:nowrap;font-size:.93rem}
+.cert .verify{display:block;width:fit-content;margin-top:.2rem;font-size:.88rem;font-weight:600}
 @media (max-width:760px){.edu{grid-template-columns:1fr}}
 
+.lh{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem}
+.lh-score{display:flex;align-items:center;gap:1rem;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem 1.3rem}
+.lh-score b{width:64px;height:64px;flex-shrink:0;border-radius:50%;border:4px solid var(--pass);display:grid;place-items:center;font-family:var(--serif);font-weight:500;font-size:1.5rem;color:var(--pass)}
+.lh-score span{font-weight:600;line-height:1.3}.lh-score small{color:var(--muted);font-weight:400;font-size:.85rem}
+.lh-note{color:var(--muted);font-size:.95rem;margin:0 0 2rem;max-width:70ch}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem 2rem}
+.checks h3{font-family:var(--sans);font-weight:600;font-size:1rem;margin-bottom:.3rem}
+.checks p{margin:0;color:var(--muted);font-size:.95rem}
+@media (max-width:760px){.lh{grid-template-columns:1fr}}
 /* Contact */
 .contact{background:var(--code-bg);color:var(--code-ink);border-radius:24px;padding:3.5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:2.5rem;align-items:center}
 .contact h2{font-size:clamp(2rem,4.5vw,3rem);color:#fff;line-height:1.1;margin-bottom:1rem}
@@ -458,7 +478,10 @@ footer a{color:var(--muted)}
 
       <article class="featured">
         <div class="body">
-          <span class="label">Open source</span>
+          <div class="badges">
+            <span class="label">Open source</span>
+            <a href="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation/actions/workflows/playwright-e2e.yml" target="_blank" rel="noopener" aria-label="CI status on GitHub Actions"><img src="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation/actions/workflows/playwright-e2e.yml/badge.svg" alt="Playwright E2E CI status" height="20"></a>
+          </div>
           <h3>ERPNext POS Test Framework</h3>
           <p>A Playwright (JavaScript) framework for ERPNext Retail POS India, built to show how I design a suite end to end.</p>
           <ul>
@@ -511,7 +534,7 @@ footer a{color:var(--muted)}
 
       <div class="lab-tabs" role="tablist" aria-label="QA Lab">
         <button class="tab" role="tab" aria-selected="true" aria-controls="p-hunt" id="t-hunt">Bug hunt</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p-bug" id="t-bug">Bug report</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-bug" id="t-bug">Real bug report</button>
         <button class="tab" role="tab" aria-selected="false" aria-controls="p-cases" id="t-cases">Test cases</button>
         <button class="tab" role="tab" aria-selected="false" aria-controls="p-code" id="t-code">Playwright test</button>
       </div>
@@ -547,17 +570,19 @@ footer a{color:var(--muted)}
       </div>
 
       <div class="panel" role="tabpanel" id="p-bug" aria-labelledby="t-bug" hidden>
-        <p class="panel-intro">A sample report in the format I use. Based on a demo POS, not client data.</p>
+        <p class="panel-intro">A real bug my automated test TC-POS-005 caught in the Retail POS India app, written up the way I report bugs at work. It was fixed the same day.</p>
         <dl class="kv">
-          <dt>ID</dt><dd>POS-482</dd>
-          <dt>Title</dt><dd>Discount applied twice when "Apply" is double-clicked at checkout</dd>
-          <dt>Severity</dt><dd><span class="sev">High</span> revenue loss</dd>
-          <dt>Environment</dt><dd>Staging v2.14.0, Chrome 128, Windows 11</dd>
-          <dt>Steps</dt><dd><ol><li>Add any item over ₹500 to the cart.</li><li>Enter coupon SAVE10.</li><li>Double-click "Apply" quickly.</li></ol></dd>
-          <dt>Expected</dt><dd>One 10% discount line; invoice total reduced once.</dd>
-          <dt>Actual</dt><dd>Two discount lines; invoice booked on the server with 20% off.</dd>
-          <dt>Evidence</dt><dd>Screen recording, two POST /cart/discount calls in the network log, invoice JSON from the API.</dd>
-          <dt>Suggested fix</dt><dd>Disable the button while the request is in flight and make the discount endpoint idempotent.</dd>
+          <dt>Title</dt><dd>Tapping Cash on the payment screen turns it off, so the number pad types nothing</dd>
+          <dt>Found by</dt><dd>Automated test TC-POS-005 (number pad), nightly run</dd>
+          <dt>Requirement</dt><dd>REQ-POS-010: the cashier types the amount on the number pad</dd>
+          <dt>Severity</dt><dd><span class="sev">Major</span> P2. The cashier cannot enter a cash amount until they tap Cash a second time.</dd>
+          <dt>Environment</dt><dd>ERPNext v16 with Retail POS India, local Docker. Chromium and WebKit. Cashier Anjali Verma on Till 1.</dd>
+          <dt>Steps</dt><dd><ol><li>Add 1 × QA-STOCK-001 to the cart.</li><li>Click Checkout. Cash is already selected.</li><li>Tap Cash.</li><li>Type 5 0 0 on the number pad.</li></ol></dd>
+          <dt>Expected</dt><dd>Cash shows ₹500.00.</dd>
+          <dt>Actual</dt><dd>Cash gets unselected and the number pad does nothing. The amount does not change.</dd>
+          <dt>Cause</dt><dd>ERPNext's payment tiles work like an on/off switch. Tapping the tile that is already selected switches it off.</dd>
+          <dt>Fix</dt><dd>The app now keeps a tapped tile selected and starts a new amount (<a href="https://github.com/sudhansushekhar/retail_pos_india/pull/1" target="_blank" rel="noopener">pull request #1</a>).</dd>
+          <dt>Retest</dt><dd>TC-POS-005 passes on Chromium and WebKit. Status: closed.</dd>
         </dl>
       </div>
 
@@ -636,7 +661,7 @@ test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included
           <span class="post-tag">QA + AI</span>
           <h3>Letting an AI agent write Playwright tests, safely</h3>
           <p>Lint rules, edit hooks and mutation checks that keep AI-written tests traceable to requirements and able to fail.</p>
-          <span class="read"><span>Read article</span><small>6 min read</small></span>
+          <span class="read"><span>Read article</span><small>5 min read</small></span>
         </a>
         <a class="post" href="katalon-to-playwright-migration.html">
           <span class="post-tag">Test automation</span>
@@ -648,7 +673,7 @@ test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included
           <span class="post-tag">API testing</span>
           <h3>Why my tests check the server, not the screen</h3>
           <p>Verifying invoices, GST and stock through the API catches the bugs a UI-only assertion misses.</p>
-          <span class="read"><span>Read article</span><small>4 min read</small></span>
+          <span class="read"><span>Read article</span><small>3 min read</small></span>
         </a>
       </div>
     </div>
@@ -661,9 +686,9 @@ test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included
       <div class="edu">
         <div class="card">
           <h3>Certifications</h3>
-          <div class="cert"><b>Katalon Professional Level Certification</b><span>Sep 2026</span></div>
-          <div class="cert"><b>Katalon AI-skilled Practitioner Certification</b><span>Sep 2026</span></div>
-          <div class="cert"><b>AI-driven Test Automation Engineer (testRigor)</b><span>Sep 2024</span></div>
+          <div class="cert"><div><b>Katalon Professional Level Certification</b><a class="verify" href="https://academy.katalon.com/mcertificate/6aad159ab6b54" target="_blank" rel="noopener">Verify on Katalon Academy</a></div><span>Sep 2026</span></div>
+          <div class="cert"><div><b>Katalon AI-skilled Practitioner Certification</b><a class="verify" href="https://academy.katalon.com/mcertificate/6aad159b5ae7b" target="_blank" rel="noopener">Verify on Katalon Academy</a></div><span>Sep 2026</span></div>
+          <div class="cert"><div><b>AI-driven Test Automation Engineer (testRigor)</b><a class="verify" href="https://testrigor.com/certificates/DB3gCZYuoFS7qAMmZpKSSznc" target="_blank" rel="noopener">Verify on testRigor</a></div><span>Sep 2024</span></div>
         </div>
         <div class="card">
           <h3>Education</h3>
@@ -674,8 +699,29 @@ test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included
     </div>
   </section>
 
+  <!-- HOW I TESTED THIS SITE -->
+  <section id="site-testing" class="alt">
+    <div class="wrap">
+      <div class="head"><h2>How I tested this site</h2><p>A QA portfolio should pass its own checks. This is what I ran on this page before publishing it.</p></div>
+      <div class="lh">
+        <div class="lh-score"><b>99</b><span>Performance<br><small>mobile; 100 on desktop</small></span></div>
+        <div class="lh-score"><b>100</b><span>Accessibility</span></div>
+        <div class="lh-score"><b>100</b><span>SEO</span></div>
+      </div>
+      <p class="lh-note">Google Lighthouse, October 2026. The first run scored 96 for accessibility because some light grey text was too faint to read easily. I darkened those colours and ran it again.</p>
+      <div class="checks">
+        <div><h3>Screen sizes</h3><p>Checked at desktop and phone widths. Nothing scrolls sideways, and the menu folds into a button on small screens.</p></div>
+        <div><h3>Keyboard</h3><p>Every link, button, tab and receipt line can be reached with Tab and used with Enter. Focus is always visible.</p></div>
+        <div><h3>Light and dark mode</h3><p>Both themes checked. The site follows your device setting, and the button at the top switches it.</p></div>
+        <div><h3>Bug hunt</h3><p>Clicking right and wrong lines, the counter, the progress bar and Reset were checked with a Playwright script.</p></div>
+        <div><h3>Less motion</h3><p>If your device has "reduce motion" turned on, the animations switch off.</p></div>
+        <div><h3>Links</h3><p>All links, the resume download and the article pages were checked after uploading to GitHub Pages.</p></div>
+      </div>
+    </div>
+  </section>
+
   <!-- CONTACT -->
-  <section id="contact" style="padding-top:1rem">
+  <section id="contact">
     <div class="wrap">
       <div class="contact">
         <div>
@@ -712,13 +758,13 @@ test(<span class="s">'TC-POS-001 a cashier sells one item for cash: GST included
 <footer>
   <div class="wrap">
     <span>© <span id="yr"></span> Sudhanshu Shekhar</span>
-    <span>Built by hand and tested on Chrome, Firefox, Safari and mobile.</span>
+    <span>Plain HTML, CSS and JavaScript. Hosted on GitHub Pages.</span>
   </div>
 </footer>
 
 <script>
 /* Reveal on scroll */
-const revealEls=document.querySelectorAll('.head, .stats, .about > *, .skill, .job, .featured, .project, .lab-tabs, .post, .card, .contact');
+const revealEls=document.querySelectorAll('.head, .stats, .about > *, .skill, .job, .featured, .project, .lab-tabs, .post, .lh-score, .checks > div, .card, .contact');
 revealEls.forEach(el=>el.classList.add('reveal'));
 const ro=new IntersectionObserver((entries)=>{
   entries.forEach(e=>{ if(e.isIntersecting){ const t=e.target; t.classList.add('in'); ro.unobserve(t); setTimeout(()=>{t.classList.remove('reveal');t.style.transitionDelay='';},1100);} });

@@ -9,12 +9,14 @@
 <meta property="og:title" content="Letting an AI agent write Playwright tests, safely">
 <meta property="og:description" content="Lint rules, edit hooks and mutation checks that keep AI-written tests traceable to requirements and able to fail.">
 <meta property="og:type" content="article">
+<meta property="og:image" content="https://sudhansushekhar.github.io/sudhanshu-shekhar/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#EEF1F5;--surface:#FFFFFF;--ink:#142033;--muted:#5A687C;--faint:#8794A6;--line:#D8DEE7;--accent:#1F6F78;--accent-soft:#E1EFF0;--code-bg:#142033;--code-ink:#DCE5F2;
+:root{--bg:#EEF1F5;--surface:#FFFFFF;--ink:#142033;--muted:#56647A;--faint:#5F6B7B;--line:#D8DEE7;--accent:#1F6F78;--accent-soft:#E1EFF0;--code-bg:#142033;--code-ink:#DCE5F2;
 --serif:"Newsreader",Georgia,serif;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1724;--surface:#172234;--ink:#E6ECF4;--muted:#9DAABD;--faint:#6F7E93;--line:#26344A;--accent:#6CC3CC;--accent-soft:#16323A;--code-bg:#0A101A}}
@@ -73,34 +75,22 @@ article > *{animation:rise .6s ease both}
   <span class="tagline">QA + AI</span>
   <h1>Letting an AI agent write Playwright tests, safely</h1>
   <p class="dek">Lint rules, edit hooks and mutation checks that keep AI-written tests traceable to requirements and able to fail.</p>
-  <div class="meta"><div class="avatar" aria-hidden="true">SS</div><div><b>Sudhanshu Shekhar</b><span>Senior QA Automation Engineer · 6 min read · October 2026</span></div></div>
+  <div class="meta"><div class="avatar" aria-hidden="true">SS</div><div><b>Sudhanshu Shekhar</b><span>Senior QA Automation Engineer · 5 min read · October 2026</span></div></div>
   <div class="body">
-<p>AI coding agents can write a Playwright test in seconds. That speed is real, and I use it. But speed isn't the hard part of test automation. Trust is. A test suite is only useful if a green run means the product works, and an AI agent left to itself is very good at writing tests that go green for the wrong reasons.</p>
+<p>I use Claude Code to write Playwright tests in my <a href="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation" target="_blank" rel="noopener">ERPNext POS project</a>. It is fast. But early on I noticed a problem. Many of the tests it wrote would pass even if the feature was broken. A test like that is worse than no test, because it makes you feel safe when you are not.</p>
+<p>So I set up some rules. Most of them are checked by scripts, so I don't have to catch everything by reading each line. In this post I'll go through them one by one.</p>
 
-<p>In my open-source <a href="https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation" target="_blank" rel="noopener">ERPNext POS test framework</a>, Claude Code writes the tests, but only inside a set of guardrails. This article walks through them, with the real files from the repo.</p>
-
-<h2>What goes wrong without guardrails</h2>
-<p>I log every mistake the AI makes in <code>docs/ai-review-log.md</code>. A few real entries show the pattern:</p>
+<h2>What went wrong at first</h2>
+<p>I keep a file called <code>ai-review-log.md</code>. Every time the AI gets something wrong, I write it down there. A few real examples:</p>
 <ul>
-  <li><strong>Writing from memory, not from the product.</strong> It expected a "Login" button and the Desk at <code>/app</code>. ERPNext v16 shows "Continue" and lands on <code>/desk</code>. The AI was writing from older versions.</li>
-  <li><strong>A check that couldn't fail.</strong> To prove a test worked, it flipped <code>toBeVisible()</code> to <code>toBeHidden()</code>. The test still passed, because the dialog hadn't been drawn yet. The "proof" proved nothing.</li>
-  <li><strong>A guardrail that guarded nothing.</strong> It used the <code>no-restricted-imports</code> lint rule to keep page objects out of specs. That rule only sees ES <code>import</code>, and the repo uses <code>require()</code>, so it caught nothing.</li>
+  <li>It wrote the login test from memory. It looked for a "Login" button and expected the Desk at <code>/app</code>. ERPNext v16 has a "Continue" button and opens <code>/desk</code>.</li>
+  <li>To prove a test could fail, it changed <code>toBeVisible()</code> to <code>toBeHidden()</code>. The test still passed, because the dialog had not loaded yet. So the "proof" proved nothing.</li>
+  <li>It used the <code>no-restricted-imports</code> lint rule to block some imports. My project uses <code>require()</code>, and that rule only looks at <code>import</code>. It never caught anything.</li>
 </ul>
-<p>None of these are unusual; a junior tester could make any of them. The difference is that an agent can make them many times in an afternoon. So every rule that a program can check, a program checks.</p>
+<p>These are normal mistakes. A new tester could make them too. The difference is that the AI can make them many times in one afternoon.</p>
 
-<h2>The loop: the AI writes, the tester decides</h2>
-<p>Every test goes through the same steps. The AI does the fast work; I do the judging.</p>
-<ol>
-  <li>A requirement goes into <code>docs/requirements/</code> with an ID, like <code>REQ-POS-004</code>.</li>
-  <li>The AI <strong>drafts</strong> test cases from it (<code>/test-cases</code>), marked <code>Status: draft</code>.</li>
-  <li><strong>I review the draft</strong>, fix values, add missing cases and set <code>Status: approved</code>.</li>
-  <li>The AI writes the test from the approved case (<code>/write-test</code>), runs it and mutation-checks it.</li>
-  <li>The AI and I review the test against a 10-point checklist (<code>/review-test</code>).</li>
-  <li>What the AI got wrong goes into the review log, and a new rule goes into <code>CLAUDE.md</code>.</li>
-</ol>
-
-<h2>Guardrail 1: every test starts from an approved test case</h2>
-<p>The AI doesn't decide what to test. A test case in plain English comes first, in a fixed format: an ID, the requirement it checks, priority, severity, steps and checks. Here is a real one, shortened:</p>
+<h2>Rule 1: the test case comes first</h2>
+<p>The AI does not decide what to test. First there is a test case in plain English. Either I write it, or the AI drafts it from the requirement and I review it before anything else happens. Each test case has an ID, the requirement it covers, priority, severity, steps and checks. This is a real one, a bit shortened:</p>
 <pre><code>## TC-POS-001 a cashier sells one item for cash: GST included, booked as a POS sales invoice
 **Requirement:** REQ-POS-004, REQ-POS-008, REQ-POS-009, REQ-POS-015 · **Priority:** P0 · **Severity:** blocker
 **Runs:** `@smoke` · **Test data:** QA-STOCK-001 (₹118.00, GST 18%), Walk-in Customer, Till 1
@@ -113,61 +103,56 @@ article > *{animation:rise .6s ease both}
 - The cart shows Net Total ₹100.00, CGST ₹9.00, SGST ₹9.00, Grand Total ₹118.00.
 - The Sales Invoice the screen submitted, read back by name: `is_pos` 1, submitted,
   net ₹100.00, CGST ₹9.00, SGST ₹9.00, grand total ₹118.00, one payment row Cash ₹118.00.
-- Stock of QA-STOCK-001 is exactly 1 lower after the sale.
+- Stock of QA-STOCK-001 is exactly 1 lower after the sale.</code></pre>
+<p>The test title in the code has to be exactly this heading. That way any failure points straight back to a test case and a requirement. The AI is also not allowed to invent a value that is not in the test case. If it needs one, it has to ask me.</p>
 
-**Change it when** the POS payment screen, GST setup, POS profile or stock settings change.</code></pre>
-<p>Two rules make this work. The test's title must be the test case's exact heading, so every failure traces back to a case and a requirement. And the AI must not invent a value the test case doesn't give. If it needs one, it asks.</p>
-
-<h2>Guardrail 2: a lint that enforces the rules</h2>
-<p><code>CLAUDE.md</code> lists the rules for writing tests. The ones a machine can check are in <code>eslint.config.js</code>, and each error message names the rule number it breaks:</p>
+<h2>Rule 2: lint checks the easy rules</h2>
+<p>My rules for writing tests are in a file called <code>CLAUDE.md</code>. Some of them are simple enough for a machine to check, so I put those in ESLint:</p>
 <ul>
-  <li>specs import <code>test</code> and <code>expect</code> only from <code>src/fixtures</code>; page objects and the API come as fixtures</li>
-  <li>no locators in specs; they live in page objects</li>
-  <li>no <code>waitForTimeout</code>: wait for the server, not the clock</li>
+  <li>no locators in spec files, they belong in page objects</li>
+  <li><code>test</code> and <code>expect</code> come only from <code>src/fixtures</code></li>
+  <li>no <code>waitForTimeout</code></li>
   <li>no <code>.only</code>, <code>.skip</code>, <code>.fixme</code> or <code>.fail</code>, and no forced clicks</li>
 </ul>
+<p>Every error message says which rule number was broken, so the AI knows what to fix:</p>
 <pre><code>{
   selector: `CallExpression[callee.property.name=/^(${LOCATOR_METHODS})$/]`,
   message: <span class="s">'Rule 4: no locators in specs. Add a method or property to a page object in src/pages.'</span>,
 }</code></pre>
-<p>After the <code>no-restricted-imports</code> mistake, there's one more rule about the rules: every lint rule is proven on a deliberately bad example before it's trusted. A lint rule that never fires is the same as a test that never fails.</p>
+<p>After the <code>no-restricted-imports</code> mistake, I added one more habit. Before I trust a new lint rule, I run it on a file that breaks it on purpose. If it doesn't complain, the rule doesn't work.</p>
 
-<h2>Guardrail 3: a hook lints every file the AI edits</h2>
-<p>Linting at the end isn't enough, because by then the agent may have built several files on top of a bad pattern. Claude Code supports hooks, so after every file the AI edits, a hook lints that file:</p>
+<h2>Rule 3: a hook runs after every edit</h2>
+<p>Running lint only at the end is too late. By then the AI may have written five more files with the same problem. Claude Code supports hooks, so I added one that runs every time the AI edits or writes a file:</p>
 <pre><code><span class="c">// .claude/settings.json</span>
 <span class="s">"PostToolUse"</span>: [{
   <span class="s">"matcher"</span>: <span class="s">"Edit|Write"</span>,
   <span class="s">"hooks"</span>: [{ <span class="s">"type"</span>: <span class="s">"command"</span>,
     <span class="s">"command"</span>: <span class="s">"node \"$CLAUDE_PROJECT_DIR/scripts/lint-edited-file.js\""</span> }]
 }]</code></pre>
-<p>If the edited file is under <code>tests/</code> or <code>src/</code> and breaks a rule, the script exits with code 2 and prints the lint output. Claude Code hands that straight back to the agent, which has to fix it before going on. The same lint runs for people with <code>npm run lint</code>, and in CI on every pull request.</p>
+<p>If the file is in <code>tests/</code> or <code>src/</code> and lint fails, the script exits with code 2. Claude Code passes the error back to the AI, and it has to fix the file before it moves on. The same lint also runs in CI on every pull request.</p>
 
-<h2>Guardrail 4: a mutation check proves each test can fail</h2>
-<p>This is the guardrail I value most. A test that can't fail is worse than no test, because it gives false confidence. So every new test goes through <code>/mutation-check</code>:</p>
+<h2>Rule 4: every test must be able to fail</h2>
+<p>For me this is the most important one. For every new test, the AI runs <code>/mutation-check</code>:</p>
 <ol>
-  <li>Pick the assertion that guards the main business result, such as the grand total.</li>
-  <li>Change only its expected value to something wrong but plausible, like 118 → 119.</li>
-  <li>Run the test and show it fails.</li>
-  <li>Restore the value exactly, run again and show it passes.</li>
+  <li>Pick the main check, for example the grand total.</li>
+  <li>Change the expected value to something wrong, like 118 to 119.</li>
+  <li>Run the test. It has to fail.</li>
+  <li>Put the value back and run it again. It has to pass.</li>
 </ol>
-<p>If the test still passes after the change, it proves nothing and gets reworked. The <code>toBeHidden()</code> mistake added a lesson here: for a visibility check, break the <em>state</em> (for example, open the till first so the dialog must not appear), not the direction of the assertion.</p>
-<div class="callout"><p>A green test only means something if you've seen it go red for the right reason.</p></div>
+<p>If the test still passes with the wrong value, it isn't testing anything, and it goes back to be fixed. From the <code>toBeHidden()</code> mistake I also learned that for visibility checks you should change the situation, not the assertion. For example, open the till first, so the opening dialog should not show up at all.</p>
 
-<h2>Guardrail 5: every AI mistake becomes a rule</h2>
-<p>The review log isn't a list of complaints. Each entry records what the AI did, why it was wrong, and the rule or fix added so it doesn't happen again. "Locators come from the real page's accessibility tree, read before writing" came from the Login-button mistake. "Read test durations, not only pass/fail" came from a WebKit test that passed at 60 of its 60 seconds, then failed on the next run.</p>
-<p>The agent forgets instructions. The rules in <code>CLAUDE.md</code>, the lint and the hook don't.</p>
+<h2>Rule 5: every mistake turns into a rule</h2>
+<p>Each entry in the review log has three parts: what the AI did, why it was wrong, and what I changed so it doesn't happen again. After the login button mistake, the rule became "read the real page before writing locators". Another time a WebKit test passed using 60 of its 60 seconds, then failed on the next run. Now the rule is to look at how long each test takes, not just whether it passed.</p>
 
-<h2>What I still do by hand</h2>
-<p>The guardrails don't replace a tester. They free up time for the parts that need judgement:</p>
+<h2>What I still do myself</h2>
 <ul>
-  <li>approving test cases: the right values, the missing unhappy paths, the questions the AI should have asked</li>
-  <li>reviewing each test against the checklist, especially "checks the saved record, not only the screen"</li>
-  <li>approving the rules that come out of the review log</li>
-  <li>deciding when code is pushed: the AI asks, I decide</li>
+  <li>approve the test cases, and add the negative cases the AI missed</li>
+  <li>review every test against my 10-point checklist</li>
+  <li>decide when code is pushed. The AI asks, I say yes or no.</li>
 </ul>
 
-<h2>The takeaway</h2>
-<p>AI agents are fast, but they aim for a passing test, not a meaningful one. The answer isn't to avoid them. It's to give them the same rules a good QA team gives a new hire: start from approved test cases, follow the coding standards, get every change checked, prove every test can catch a bug, and learn from every mistake. Put those rules in code, and the agent follows them every time.</p>
+<h2>To sum up</h2>
+<p>The AI writes code much faster than I do. But its goal is a passing test, not finding bugs. So I give it the same rules I'd give a new person on the team, and I put those rules into scripts so they get checked every single time. Everything in this post is in the repo if you want to look at the real files.</p>
 
   </div>
   <div class="end">
