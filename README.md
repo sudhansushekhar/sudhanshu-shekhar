@@ -1,46 +1,42 @@
-# Hi, I'm Sudhanshu 👋
+# Sudhanshu Shekhar | QA Automation Portfolio
 
-I'm a **Senior QA Automation Engineer** with 5+ years of experience testing retail POS and ERP systems.  
-At iVend Retail I'm moving our POS and ERP regression suites from Katalon to Playwright (JavaScript).
+My personal portfolio as a Senior QA Automation Engineer. It's a small static site, written by hand and hosted on GitHub Pages.
 
-My tests don't stop at the screen. They also check that every sale is saved correctly on the server.
+**Live site:** https://sudhansushekhar.github.io/sudhanshu-shekhar/
 
-**Portfolio:** [sudhansushekhar.github.io/sudhanshu-shekhar](https://sudhansushekhar.github.io/sudhanshu-shekhar/)  
-**LinkedIn:** [sudhanshu-shekhar-sud](https://www.linkedin.com/in/sudhanshu-shekhar-sud)  
-**Email:** sudhanshushekhar496@gmail.com
+## What's on the site
 
----
+- **Experience, skills and certifications**, with links to verify each certificate
+- **Featured project:** my [ERPNext POS Test Framework](https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation), built with Playwright and JavaScript
+- **QA Lab:**
+  - a bug hunt you can play on a demo POS receipt
+  - a real bug report from my framework
+  - a real test case and the Playwright test written from it
+- **Writing:** three articles on test automation and using AI to write tests
+- **How I tested this site:** Lighthouse scores, with a button that runs a live test through Google PageSpeed Insights
+- **Resume** as a downloadable PDF
 
-## What I'm working on
+## How it's built
 
-**[ERPNext POS Test Framework](https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation)**
+- Plain HTML, CSS and JavaScript. No framework and no build step.
+- Light and dark mode, following the device setting.
+- Works on phones, tablets and desktops.
+- Usable with the keyboard, and respects the "reduce motion" setting.
+- Fonts load without blocking the page, and the photo and preview image are compressed to keep it fast.
 
-[![ERPNext POS · Playwright E2E](https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation/actions/workflows/playwright-e2e.yml/badge.svg)](https://github.com/sudhansushekhar/erpnext-playwright-ai-test-automation/actions/workflows/playwright-e2e.yml)
+## Files
 
-A Playwright (JavaScript) framework for ERPNext Retail POS India.
+| File | What it is |
+|---|---|
+| `index.html` | The main page |
+| `ai-agent-playwright-tests.html` | Article: letting an AI agent write Playwright tests, safely |
+| `katalon-to-playwright-migration.html` | Article: moving a large POS test suite from Katalon to Playwright |
+| `check-the-server-not-the-screen.html` | Article: why my tests check the server, not the screen |
+| `resume.pdf` | My resume |
+| `og-image.png` | The preview image shown when the link is shared |
+| `google….html` | Google Search Console verification. Do not delete. |
 
-- Every test reads back the invoice the server saved and checks status, GST, payment and stock.
-- GitHub Actions starts ERPNext in Docker, runs smoke tests on every pull request and the full suite every night on Chromium and WebKit.
-- An AI coding agent writes tests, but only from approved test cases, with lint rules, an edit hook and a mutation check to catch its mistakes.
+## Contact
 
-**[retail_pos_india](https://github.com/sudhansushekhar/retail_pos_india)**: the Frappe app under test, with ERPNext in Docker.
-
----
-
-## What I write about
-
-- [Letting an AI agent write Playwright tests, safely](https://sudhansushekhar.github.io/sudhanshu-shekhar/ai-agent-playwright-tests.html)
-- [Moving a large POS test suite from Katalon to Playwright](https://sudhansushekhar.github.io/sudhanshu-shekhar/katalon-to-playwright-migration.html)
-- [Why my tests check the server, not the screen](https://sudhansushekhar.github.io/sudhanshu-shekhar/check-the-server-not-the-screen.html)
-
----
-
-## Tools I use
-
-- **Automation:** Playwright (JavaScript), Selenium (Java), TestNG, Katalon Studio, testRigor
-- **API testing:** REST APIs, Postman, RestAssured
-- **CI/CD:** GitHub Actions, Jenkins, Docker, Git
-- **Data:** SQL, MySQL
-- **Test management:** Jira, TestRail
-
-Katalon Expert certified · Open to Senior QA Automation and SDET roles
+- LinkedIn: [sudhanshu-shekhar-sud](https://www.linkedin.com/in/sudhanshu-shekhar-sud)
+- Email: sudhanshushekhar496@gmail.com
