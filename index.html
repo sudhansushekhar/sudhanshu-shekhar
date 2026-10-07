@@ -172,10 +172,17 @@ section{padding:5rem 0}
 .receipt header span{color:var(--muted);font-size:.85rem}
 .row{display:flex;justify-content:space-between;gap:1rem;padding:.38rem 0}
 .row small{color:var(--muted)}
-.row.total{border-top:1px dashed var(--line);margin-top:.5rem;padding-top:.75rem;font-weight:700;font-size:1.05rem}
+.row.total{border-top:1px dashed var(--line);margin-top:.5rem;padding-top:.75rem;border-radius:0 0 8px 8px;font-weight:700;font-size:1.05rem}
 .payb{width:100%;margin-top:1rem;padding:.75rem;border:none;border-radius:10px;background:var(--accent);color:#fff;font:600 1rem var(--sans)}
-.bug{cursor:crosshair;border-radius:5px;padding:0 .2rem;margin:0 -.2rem;transition:background .15s}
-.bug:hover{background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.bug{border-radius:5px;padding:0 .2rem;margin:0 -.2rem}
+.receipt .row{cursor:pointer;border-radius:8px;padding:.45rem .55rem;margin:0 -.55rem;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.receipt .row:hover{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.receipt .row.is-bug{background:color-mix(in srgb,var(--fail) 10%,transparent)}
+.receipt .row.is-ok{animation:okflash .9s ease}
+@keyframes okflash{0%,60%{background:color-mix(in srgb,var(--pass) 16%,transparent)}100%{background:transparent}}
+.feedback{min-height:3rem;margin:0 0 1rem;padding:.7rem .9rem;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--muted);font-size:.95rem;animation:drop .25s ease-out}
+.feedback.hit{border-color:var(--fail);color:var(--fail);background:color-mix(in srgb,var(--fail) 8%,var(--surface))}
+.feedback.miss{border-color:var(--pass);color:var(--pass);background:color-mix(in srgb,var(--pass) 8%,var(--surface))}
 .bug.found{background:color-mix(in srgb,var(--fail) 14%,transparent);box-shadow:0 0 0 2px var(--fail)}
 .score{font-family:var(--serif);font-size:1.6rem;margin:0 0 .4rem}
 .progress{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:1.2rem}
@@ -189,6 +196,7 @@ section{padding:5rem 0}
 .found-list li.on .hidden-txt{filter:none}
 .ghost{margin-top:1rem;background:none;border:1px solid var(--line);color:var(--ink);padding:.5rem .95rem;border-radius:10px;cursor:pointer;font:500 .93rem var(--sans)}
 @media (max-width:860px){.hunt{grid-template-columns:1fr}}
+@media (max-width:560px){.panel{padding:1.1rem}.receipt{padding:1.1rem 1rem}}
 
 .kv{display:grid;grid-template-columns:140px 1fr;gap:.6rem 1.2rem;margin:0}
 .kv dt{color:var(--muted);font-weight:500}.kv dd{margin:0}
@@ -490,7 +498,7 @@ footer a{color:var(--muted)}
       </div>
 
       <div class="panel" role="tabpanel" id="p-hunt" aria-labelledby="t-hunt">
-        <p class="panel-intro">This POS receipt has 5 planted bugs. Tap anything that looks wrong. Hints unlock as you find them.</p>
+        <p class="panel-intro"><b>How to play:</b> this shop receipt has 5 hidden mistakes. Tap any line you think is wrong. A red mark means you found a bug; a green flash means that line is correct. Each bug you find unlocks its explanation.</p>
         <div class="hunt">
           <div class="receipt" aria-label="Demo POS receipt with planted bugs">
             <header><b>Invoice POS-INV-1042</b><span>Store: Pune Central</span></header>
@@ -505,6 +513,7 @@ footer a{color:var(--muted)}
           </div>
           <div>
             <p class="score" id="score">0 of 5 found</p>
+            <p class="feedback" id="feedback" aria-live="polite">Start by tapping any line on the receipt.</p>
             <div class="progress"><i id="bar"></i></div>
             <ul class="found-list" id="foundList">
               <li data-i="0"><span class="hidden-txt">Line total ignores quantity: 3 × ₹150 should be ₹450.00</span></li>
@@ -657,7 +666,7 @@ test(<span class="s">'POS sale books correct GST on the server @smoke'</span>, <
 
 <script>
 /* Reveal on scroll */
-const revealEls=document.querySelectorAll('.head, .stats, .about > *, .skill, .job, .featured, .project, .lab-tabs, .panel, .post, .card, .contact');
+const revealEls=document.querySelectorAll('.head, .stats, .about > *, .skill, .job, .featured, .project, .lab-tabs, .post, .card, .contact');
 revealEls.forEach(el=>el.classList.add('reveal'));
 const ro=new IntersectionObserver((entries)=>{
   entries.forEach(e=>{ if(e.isIntersecting){ const t=e.target; t.classList.add('in'); ro.unobserve(t); setTimeout(()=>{t.classList.remove('reveal');t.style.transitionDelay='';},1100);} });
@@ -698,19 +707,38 @@ tabs.forEach((t,i)=>{
 });
 
 /* Bug hunt */
-const found=new Set(), bugs=[...document.querySelectorAll('.bug')], total=5;
+const found=new Set(), total=5, rows=[...document.querySelectorAll('.receipt .row')];
+const fb=document.getElementById('feedback');
+const bugText=[...document.querySelectorAll('#foundList li')].map(li=>li.textContent.trim());
+function say(msg,kind){fb.textContent=msg;fb.className='feedback '+kind;fb.style.animation='none';fb.offsetHeight;fb.style.animation='';}
 function updateHunt(){
   document.getElementById('score').textContent = found.size===total ? 'All 5 found. Nice catch!' : found.size+' of '+total+' found';
   document.getElementById('bar').style.width=(found.size/total*100)+'%';
   document.querySelectorAll('#foundList li').forEach(li=>li.classList.toggle('on',found.has(+li.dataset.i)));
 }
-bugs.forEach(b=>{
-  b.tabIndex=0; b.setAttribute('role','button'); b.setAttribute('aria-label','Report a possible bug here');
-  const hit=()=>{found.add(+b.dataset.bug); b.classList.add('found'); updateHunt();};
-  b.addEventListener('click',hit);
-  b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();hit();}});
+rows.forEach(r=>{
+  r.tabIndex=0; r.setAttribute('role','button');
+  const bug=r.querySelector('.bug');
+  const check=()=>{
+    if(bug){
+      const i=+bug.dataset.bug;
+      if(found.has(i)){ say('Already found: '+bugText[i],'again'); return; }
+      found.add(i); r.classList.add('is-bug'); bug.classList.add('found'); updateHunt();
+      say(found.size===total ? 'You found every bug. You think like a tester!' : 'Bug found! '+bugText[i],'hit');
+    } else {
+      r.classList.remove('is-ok'); void r.offsetWidth; r.classList.add('is-ok');
+      say('That line is correct. Keep looking.','miss');
+    }
+  };
+  r.addEventListener('click',check);
+  r.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();check();}});
 });
-document.getElementById('resetHunt').addEventListener('click',()=>{found.clear();bugs.forEach(b=>b.classList.remove('found'));updateHunt();});
+document.getElementById('resetHunt').addEventListener('click',()=>{
+  found.clear();
+  rows.forEach(r=>r.classList.remove('is-bug','is-ok'));
+  document.querySelectorAll('.bug').forEach(b=>b.classList.remove('found'));
+  updateHunt(); say('Start by tapping any line on the receipt.','');
+});
 
 /* Theme toggle */
 document.getElementById('themeBtn').addEventListener('click',()=>{
